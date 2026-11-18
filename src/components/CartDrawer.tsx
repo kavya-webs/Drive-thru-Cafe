@@ -11,7 +11,8 @@ import {
   Car, 
   ShieldCheck, 
   MapPin, 
-  AlertCircle
+  AlertCircle,
+  AlertTriangle
 } from 'lucide-react';
 import { isWithinGeofence } from '@/lib/geo';
 
@@ -38,16 +39,25 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onTriggerAuth }) => {
   const isUserBlacklisted = currentUser ? isPhoneBlacklisted(currentUser.phone) : false;
 
   const handleCheckout = () => {
-    if (!currentUser) {
-      onTriggerAuth({ carType, carPlate });
+    // 1. Strict Geofence Check: We do not accept orders from far
+    if (!isWithinZone) {
+      alert(`Orders from far are not accepted. You are currently ${userDistanceKm} km away. Please place your order when you are within 3 km of Ram Chowk, Mota Varachha.`);
       return;
     }
 
+    // 2. Blacklist Check
     if (isUserBlacklisted) {
       alert('Your phone number has an uncollected order on record. Please visit the counter directly.');
       return;
     }
 
+    // 3. User Authentication Check
+    if (!currentUser) {
+      onTriggerAuth({ carType, carPlate });
+      return;
+    }
+
+    // 4. Create Order
     const cartItemsFormatted = cart.map(ci => ({
       id: ci.item.id,
       name: ci.item.name,
@@ -86,7 +96,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onTriggerAuth }) => {
                 Your Drive-Thru Order
               </h3>
               <p className="text-[11px] text-concrete-500 dark:text-zinc-400">
-                Ram Chowk Lane 1 · Physical Payment at Counter
+                Ram Chowk Lane 1 · Physical Payment at Window
               </p>
             </div>
           </div>
@@ -99,21 +109,23 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onTriggerAuth }) => {
           </button>
         </div>
 
-        {/* Proximity / Location Info */}
+        {/* ========================================================================= */}
+        {/* GEOFENCE STATUS: STRICTLY LIMIT ORDERS TO WITHIN 3 KM                     */}
+        {/* ========================================================================= */}
         <div className="px-4 py-2.5 border-b border-concrete-200 dark:border-white/10 bg-concrete-50 dark:bg-white/5 flex items-center justify-between text-xs">
           <div className="flex items-center gap-2">
-            <MapPin className={`w-3.5 h-3.5 ${isWithinZone ? 'text-emerald-500' : 'text-amber-500'}`} />
+            <MapPin className={`w-3.5 h-3.5 ${isWithinZone ? 'text-emerald-500' : 'text-red-500 animate-pulse'}`} />
             <div>
-              <span className="font-bold text-concrete-800 dark:text-zinc-200 block">
-                {isWithinZone ? `📍 ${userDistanceKm} km from Grey Dot` : `📍 ${userDistanceKm} km away`}
+              <span className={`font-bold block ${isWithinZone ? 'text-concrete-800 dark:text-zinc-200' : 'text-red-500'}`}>
+                {isWithinZone ? `📍 ${userDistanceKm} km from Grey Dot` : `🚫 ${userDistanceKm} km away (Too Far)`}
               </span>
               <span className="text-[10px] text-concrete-500 dark:text-zinc-400">
-                {isWithinZone ? 'Approaching Drive-Thru Lane' : 'Outside 3 km Zone'}
+                {isWithinZone ? 'Within 3 km Drive-Thru Perimeter' : 'Orders Only Accepted Within 3 km'}
               </span>
             </div>
           </div>
 
-          {/* Quick simulator buttons for client demonstration */}
+          {/* Quick simulator toggles for client testing */}
           <div className="flex items-center gap-1 font-mono text-[10px]">
             <button
               onClick={() => setUserDistanceKm(0.6)}
@@ -122,7 +134,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onTriggerAuth }) => {
                   ? 'bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border-emerald-500/30 font-bold'
                   : 'bg-white dark:bg-noir-card text-concrete-600 dark:text-zinc-400 border-concrete-300 dark:border-white/10'
               }`}
-              title="Simulate car nearby (0.6 km)"
+              title="Simulate vehicle nearby (0.6 km)"
             >
               Nearby (0.6km)
             </button>
@@ -130,10 +142,10 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onTriggerAuth }) => {
               onClick={() => setUserDistanceKm(14.8)}
               className={`px-2 py-0.5 rounded border transition ${
                 userDistanceKm > 3
-                  ? 'bg-amber-500/20 text-amber-500 border-amber-500/30 font-bold'
+                  ? 'bg-red-500/20 text-red-500 border-red-500/30 font-bold'
                   : 'bg-white dark:bg-noir-card text-concrete-600 dark:text-zinc-400 border-concrete-300 dark:border-white/10'
               }`}
-              title="Simulate car far away (15 km)"
+              title="Simulate vehicle far away (15 km)"
             >
               Far (15km)
             </button>
@@ -142,6 +154,23 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onTriggerAuth }) => {
 
         {/* Cart Items List with Real Food Photos */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-5 space-y-3">
+          
+          {/* Prominent Warning if outside 3 km */}
+          {!isWithinZone && (
+            <div className="p-3.5 rounded-2xl bg-red-500/10 border border-red-500/25 text-xs text-red-500 space-y-1.5 animate-in fade-in">
+              <div className="font-bold flex items-center gap-1.5 text-red-500">
+                <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                <span>We Do Not Accept Orders From Far</span>
+              </div>
+              <p className="text-[11px] text-concrete-700 dark:text-zinc-300 leading-relaxed">
+                You are currently <strong>{userDistanceKm} km away</strong>. Grey Dot only accepts drive-thru orders within a <strong>3 km radius of Ram Chowk, Mota Varachha</strong> so that your drinks and meals stay fresh upon your arrival.
+              </p>
+              <p className="text-[10px] text-concrete-500 dark:text-zinc-400 font-semibold pt-0.5">
+                💡 Please place your order when approaching the lane!
+              </p>
+            </div>
+          )}
+
           {cart.length === 0 ? (
             <div className="text-center py-16 text-concrete-500 dark:text-zinc-500">
               <span className="text-4xl block mb-2">☕</span>
@@ -265,17 +294,26 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onTriggerAuth }) => {
             </div>
           </div>
 
+          {/* Action CTA: Strictly disabled if outside 3 km zone */}
           <button
             onClick={handleCheckout}
-            disabled={cart.length === 0 || isUserBlacklisted}
-            className="w-full py-3.5 text-sm font-bold rounded-xl bg-brand-sky hover:bg-brand-skyDark text-black shadow-lg shadow-brand-sky/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            disabled={cart.length === 0 || !isWithinZone || isUserBlacklisted}
+            className={`w-full py-3.5 text-sm font-bold rounded-xl transition-all flex items-center justify-center gap-2 shadow-lg ${
+              !isWithinZone
+                ? 'bg-red-500/20 text-red-500 border border-red-500/30 cursor-not-allowed opacity-90'
+                : 'bg-brand-sky hover:bg-brand-skyDark text-black shadow-brand-sky/20 disabled:opacity-40 disabled:cursor-not-allowed'
+            }`}
           >
-            <span>Confirm Drive-Thru Order (Pay at Window) →</span>
+            {!isWithinZone ? (
+              <span>🚫 Out of Range ({userDistanceKm} km away — Max 3 km)</span>
+            ) : (
+              <span>Confirm Drive-Thru Order (Pay at Window) →</span>
+            )}
           </button>
 
           <p className="text-center text-[11px] text-concrete-500 dark:text-zinc-400 mt-2.5 flex items-center justify-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-            <span>100% Physical Payment at Window · Cash, Card, or UPI at counter</span>
+            <span>Orders accepted within 3 km only · Physical payment at counter</span>
           </p>
         </div>
 

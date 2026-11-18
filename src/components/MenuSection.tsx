@@ -40,22 +40,26 @@ export const MenuSection: React.FC = () => {
                 Grey Dot. Coffee Shop Surat
               </h1>
               <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                DRIVE-THRU LANE OPEN
+                DRIVE-THRU OPEN (&lt; 3 KM ONLY)
               </span>
             </div>
             <p className="text-xs text-concrete-600 dark:text-zinc-400 mt-0.5">
-              ITC Mantra, Ram Chowk, Mota Varachha, Surat · Open Daily 9:00 AM – 12:00 Midnight
+              ITC Mantra, Ram Chowk, Mota Varachha, Surat · Orders accepted within 3 km only
             </p>
           </div>
         </div>
 
         <div className="flex items-center gap-3 text-xs">
           <div className="px-3.5 py-2 rounded-xl border border-concrete-200 dark:border-white/10 text-right bg-concrete-50 dark:bg-white/5">
-            <span className="text-concrete-500 dark:text-zinc-500 block text-[10px] font-semibold">EST. DRIVE-THRU PREP</span>
+            <span className="text-concrete-500 dark:text-zinc-500 block text-[10px] font-semibold">DRIVE-THRU RADIUS</span>
+            <span className="font-bold text-red-500 dark:text-red-400 font-mono text-sm">&lt; 3.0 km</span>
+          </div>
+          <div className="px-3.5 py-2 rounded-xl border border-concrete-200 dark:border-white/10 text-right bg-concrete-50 dark:bg-white/5">
+            <span className="text-concrete-500 dark:text-zinc-500 block text-[10px] font-semibold">EST. PREP</span>
             <span className="font-bold text-brand-sky font-mono text-sm">~5-7 Mins</span>
           </div>
           <div className="px-3.5 py-2 rounded-xl border border-concrete-200 dark:border-white/10 text-right bg-concrete-50 dark:bg-white/5">
-            <span className="text-concrete-500 dark:text-zinc-500 block text-[10px] font-semibold">PAYMENT MODE</span>
+            <span className="text-concrete-500 dark:text-zinc-500 block text-[10px] font-semibold">PAYMENT</span>
             <span className="font-bold text-emerald-600 dark:text-emerald-400 text-sm">Pay at Window</span>
           </div>
         </div>

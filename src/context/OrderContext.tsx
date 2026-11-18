@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { CustomerUser, Order, OrderStatus } from '@/types';
 import { playChimeSound, playReadyAlert } from '@/lib/audio';
+import { isWithinGeofence } from '@/lib/geo';
 
 interface OrderContextType {
   currentUser: CustomerUser | null;
@@ -169,6 +170,12 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     pricing?: { subtotal: number; tax: number; total: number }
   ): Order | null => {
     if (!currentUser) return null;
+
+    // STRICT LOCATION CHECK: Do not accept orders from far (> 3 km)
+    if (!isWithinGeofence(userDistanceKm)) {
+      alert(`Order blocked: You are currently ${userDistanceKm} km away. Grey Dot only accepts drive-thru orders within 3 km of Ram Chowk, Mota Varachha.`);
+      return null;
+    }
 
     const nextTokenNum = 44 + orders.length;
     const token = `GD-${nextTokenNum}`;
