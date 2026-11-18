@@ -52,14 +52,6 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@500;700;900&display=swap"
-          rel="stylesheet"
-        />
-      </head>
       <body className="antialiased min-h-screen bg-concrete-100 dark:bg-noir-base text-concrete-900 dark:text-zinc-100 transition-colors selection:bg-brand-sky selection:text-black">
         <ThemeProvider>
           <CartProvider>
