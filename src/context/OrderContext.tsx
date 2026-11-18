@@ -4,6 +4,12 @@ import React, { createContext, useContext, useState, useEffect, useRef } from 'r
 import { CustomerUser, Order, OrderStatus } from '@/types';
 import { playChimeSound, playReadyAlert } from '@/lib/audio';
 import { isWithinGeofence } from '@/lib/geo';
+import { 
+  saveOrderToFirestore, 
+  updateOrderStatusInFirestore, 
+  subscribeToOrders, 
+  clearAllOrdersFromFirestore 
+} from '@/lib/firebase';
 
 interface OrderContextType {
   currentUser: CustomerUser | null;
@@ -107,8 +113,38 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     };
     window.addEventListener('storage', handleStorageChange);
 
+    // Real-Time Cloud Firestore Sync (Works across all devices/phones over internet)
+    const unsubscribeFirestore = subscribeToOrders((cloudOrders) => {
+      setOrders(prevOrders => {
+        // If a new order arrived and wasn't in previous orders, play chime
+        if (cloudOrders.length > prevOrders.length) {
+          playChimeSound();
+        }
+        return cloudOrders;
+      });
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('greydot-orders', JSON.stringify(cloudOrders));
+      }
+      // Sync active order status for customer view
+      setActiveOrder(prevActive => {
+        if (!prevActive) return null;
+        const matching = cloudOrders.find(co => co.id === prevActive.id);
+        if (matching && matching.status !== prevActive.status) {
+          if (matching.status === 'ready') {
+            playReadyAlert();
+          }
+          if (typeof window !== 'undefined') {
+            localStorage.setItem('greydot-active-order', JSON.stringify(matching));
+          }
+          return matching;
+        }
+        return prevActive;
+      });
+    });
+
     return () => {
       window.removeEventListener('storage', handleStorageChange);
+      unsubscribeFirestore();
       if (broadcastChannelRef.current) {
         broadcastChannelRef.current.close();
       }
@@ -162,12 +198,13 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem('greydot-blacklist', JSON.stringify(updatedList));
       }
 
-      // Mark order as cancelled
+      // Mark order as cancelled in memory, local storage, and cloud Firestore
       const updated = orders.map(ord =>
         ord.id === orderId ? { ...ord, status: 'cancelled' as OrderStatus } : ord
       );
       setOrders(updated);
       broadcastOrders(updated);
+      updateOrderStatusInFirestore(orderId, 'cancelled');
     }
   };
 
@@ -180,6 +217,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     }
     broadcastOrders([]);
     broadcastActiveOrder(null);
+    clearAllOrdersFromFirestore();
   };
 
   const loginAdmin = (email: string, pass: string) => {
@@ -275,7 +313,10 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     setShowSuccessModal(true);
     playChimeSound();
 
-    // Persist and broadcast to other tabs / barista terminals
+    // Persist to Cloud Firestore (cross-device/internet sync)
+    saveOrderToFirestore(newOrder);
+
+    // Persist and broadcast locally to other tabs
     broadcastOrders(updatedOrders, true);
     broadcastActiveOrder(newOrder);
 
@@ -288,6 +329,9 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     );
     setOrders(updatedOrders);
     broadcastOrders(updatedOrders);
+
+    // Update in Cloud Firestore
+    updateOrderStatusInFirestore(orderId, status);
 
     if (activeOrder && activeOrder.id === orderId) {
       const updatedActive = { ...activeOrder, status };
@@ -327,6 +371,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
     const updatedOrders = [randomOrder, ...orders];
     setOrders(updatedOrders);
+    saveOrderToFirestore(randomOrder);
     broadcastOrders(updatedOrders, true);
     playChimeSound();
   };
