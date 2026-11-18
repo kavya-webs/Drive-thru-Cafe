@@ -18,7 +18,8 @@ import {
   CheckCheck,
   UserX,
   CreditCard,
-  ShieldAlert
+  ShieldAlert,
+  Trash2
 } from 'lucide-react';
 import { playChimeSound, playReadyAlert } from '@/lib/audio';
 
@@ -33,6 +34,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
     logoutAdmin, 
     simulateIncomingOrder, 
     markNoShow,
+    clearAllOrders,
     blacklistedPhones 
   } = useOrders();
   const { theme, toggleTheme } = useTheme();
@@ -179,6 +181,18 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
               <PlusCircle className="w-3.5 h-3.5" />
               <span className="hidden sm:inline">+ Simulate Car</span>
             </button>
+
+            {/* Reset Queue Button */}
+            {orders.length > 0 && (
+              <button
+                onClick={clearAllOrders}
+                className="px-2.5 py-1.5 rounded-xl border border-concrete-300 dark:border-white/10 hover:border-red-400 text-concrete-600 dark:text-zinc-400 hover:text-red-400 text-xs font-bold transition flex items-center gap-1"
+                title="Clear all orders queue"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span className="hidden md:inline">Reset Queue</span>
+              </button>
+            )}
 
             {/* Prominent Exit / Sign Out Button */}
             <button

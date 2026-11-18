@@ -93,7 +93,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         createOrder(
           pendingVehicleData || { carType: '', carPlate: '' },
           cartItemsFormatted,
-          { subtotal, tax, total }
+          { subtotal, tax, total },
+          user
         );
         clearCart();
         closeDrawer();

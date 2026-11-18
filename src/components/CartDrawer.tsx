@@ -69,7 +69,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onTriggerAuth }) => {
     createOrder(
       { carType, carPlate },
       cartItemsFormatted,
-      { subtotal, tax, total }
+      { subtotal, tax, total },
+      currentUser || undefined
     );
 
     clearCart();
