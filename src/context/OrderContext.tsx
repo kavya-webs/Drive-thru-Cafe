@@ -16,10 +16,20 @@ interface OrderContextType {
   setActiveOrder: (order: Order | null) => void;
   showSuccessModal: boolean;
   closeSuccessModal: () => void;
+  userDistanceKm: number;
+  setUserDistanceKm: (km: number) => void;
+  blacklistedPhones: string[];
+  isPhoneBlacklisted: (phone: string) => boolean;
+  markNoShow: (orderId: string) => void;
   createOrder: (
     vehicleData: { carType?: string; carPlate?: string },
     cartItems?: { id: string; name: string; price: number; quantity: number; image: string }[],
-    pricing?: { subtotal: number; tax: number; total: number }
+    pricing?: { subtotal: number; tax: number; total: number },
+    paymentInfo?: {
+      paymentMode: 'pay_at_window' | 'upi_online';
+      paymentStatus: 'pending' | 'paid';
+      transactionId?: string;
+    }
   ) => Order | null;
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
   simulateIncomingOrder: () => void;
@@ -46,6 +56,10 @@ const INITIAL_DEMO_ORDERS: Order[] = [
     total: 386.40,
     status: 'ready',
     createdAt: '12:30 PM',
+    paymentMode: 'upi_online',
+    paymentStatus: 'paid',
+    distanceKm: 0.4,
+    transactionId: 'UPI-9821827',
   },
   {
     id: 'ord-102',
@@ -64,6 +78,10 @@ const INITIAL_DEMO_ORDERS: Order[] = [
     total: 449.40,
     status: 'brewing',
     createdAt: '12:35 PM',
+    paymentMode: 'upi_online',
+    paymentStatus: 'paid',
+    distanceKm: 0.8,
+    transactionId: 'UPI-4491028',
   },
   {
     id: 'ord-103',
@@ -74,14 +92,16 @@ const INITIAL_DEMO_ORDERS: Order[] = [
     carType: 'Black Thar',
     carPlate: 'GJ-05-CD-9988',
     items: [
-      { id: 'gd-hazelnut-frappe', name: 'Hazelnut Crunch Frappe', price: 219, quantity: 2, image: '/images/hazelnut_frappe.jpg' },
       { id: 'gd-peri-peri-fries', name: 'Peri-Peri Cheese Fries', price: 149, quantity: 1, image: '/images/peri_peri_fries.jpg' },
     ],
-    subtotal: 587,
-    tax: 29.35,
-    total: 616.35,
+    subtotal: 149,
+    tax: 7.45,
+    total: 156.45,
     status: 'incoming',
     createdAt: 'Just now',
+    paymentMode: 'pay_at_window',
+    paymentStatus: 'pending',
+    distanceKm: 1.2,
   },
 ];
 
@@ -91,18 +111,45 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
   const [orders, setOrders] = useState<Order[]>(INITIAL_DEMO_ORDERS);
   const [activeOrder, setActiveOrder] = useState<Order | null>(INITIAL_DEMO_ORDERS[1]);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  
+  // Geolocation simulation (Defaults to 0.6 km from Ram Chowk, Surat)
+  const [userDistanceKm, setUserDistanceKm] = useState<number>(0.6);
 
-  // Load saved session if exists
+  // Blacklisted phone numbers for repeat no-shows
+  const [blacklistedPhones, setBlacklistedPhones] = useState<string[]>([]);
+
+  // Load saved session and blacklist if exists
   useEffect(() => {
     try {
       const savedUser = localStorage.getItem('greydot-user');
       if (savedUser) setCurrentUser(JSON.parse(savedUser));
       const savedAdmin = localStorage.getItem('greydot-admin');
       if (savedAdmin === 'true') setIsAdminLoggedIn(true);
+      const savedBlacklist = localStorage.getItem('greydot-blacklist');
+      if (savedBlacklist) setBlacklistedPhones(JSON.parse(savedBlacklist));
     } catch (e) {
       console.debug('Error reading local storage', e);
     }
   }, []);
+
+  const isPhoneBlacklisted = (phone: string) => {
+    const clean = phone.replace(/\D/g, '');
+    return blacklistedPhones.some(p => p.replace(/\D/g, '') === clean);
+  };
+
+  const markNoShow = (orderId: string) => {
+    const orderToFlag = orders.find(o => o.id === orderId);
+    if (orderToFlag) {
+      const updatedList = Array.from(new Set([...blacklistedPhones, orderToFlag.customerPhone]));
+      setBlacklistedPhones(updatedList);
+      localStorage.setItem('greydot-blacklist', JSON.stringify(updatedList));
+
+      // Mark order as cancelled
+      setOrders(prev =>
+        prev.map(ord => (ord.id === orderId ? { ...ord, status: 'cancelled' as OrderStatus } : ord))
+      );
+    }
+  };
 
   const loginAdmin = (email: string, pass: string) => {
     if (email.trim().toLowerCase() === 'admin@gmail.com' && pass.trim() === 'admin') {
@@ -129,7 +176,12 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
   const createOrder = (
     vehicleData: { carType?: string; carPlate?: string },
     cartItems?: { id: string; name: string; price: number; quantity: number; image: string }[],
-    pricing?: { subtotal: number; tax: number; total: number }
+    pricing?: { subtotal: number; tax: number; total: number },
+    paymentInfo?: {
+      paymentMode: 'pay_at_window' | 'upi_online';
+      paymentStatus: 'pending' | 'paid';
+      transactionId?: string;
+    }
   ): Order | null => {
     if (!currentUser) return null;
 
@@ -147,6 +199,10 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     const tax = pricing?.tax ?? Number((subtotal * 0.05).toFixed(2));
     const total = pricing?.total ?? Number((subtotal + tax).toFixed(2));
 
+    const paymentMode = paymentInfo?.paymentMode || (total > 350 ? 'upi_online' : 'pay_at_window');
+    const paymentStatus = paymentInfo?.paymentStatus || (paymentMode === 'upi_online' ? 'paid' : 'pending');
+    const transactionId = paymentInfo?.transactionId || (paymentMode === 'upi_online' ? `UPI-${Math.floor(1000000 + Math.random() * 9000000)}` : undefined);
+
     const newOrder: Order = {
       id: `ord-${Date.now()}`,
       token,
@@ -161,6 +217,10 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       total,
       status: 'incoming',
       createdAt: 'Just now',
+      paymentMode,
+      paymentStatus,
+      distanceKm: userDistanceKm,
+      transactionId,
     };
 
     setOrders(prev => [newOrder, ...prev]);
@@ -206,6 +266,10 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       total: 470.40,
       status: 'incoming',
       createdAt: 'Just now',
+      paymentMode: 'upi_online',
+      paymentStatus: 'paid',
+      distanceKm: 0.9,
+      transactionId: `UPI-${Math.floor(1000000 + Math.random() * 9000000)}`,
     };
 
     setOrders(prev => [randomOrder, ...prev]);
@@ -226,6 +290,11 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         setActiveOrder,
         showSuccessModal,
         closeSuccessModal,
+        userDistanceKm,
+        setUserDistanceKm,
+        blacklistedPhones,
+        isPhoneBlacklisted,
+        markNoShow,
         createOrder,
         updateOrderStatus,
         simulateIncomingOrder,

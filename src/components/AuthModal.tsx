@@ -4,13 +4,14 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import { useOrders } from '@/context/OrderContext';
 import { useCart } from '@/context/CartContext';
-import { X, ShieldCheck, Lock, User, Key, AlertCircle, Sparkles } from 'lucide-react';
+import { X, ShieldCheck, Lock, User, Key, AlertCircle, Sparkles, CheckCircle2, MessageSquare, ArrowLeft } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
   pendingVehicleData?: { carType?: string; carPlate?: string };
   initialTab?: 'customer' | 'staff';
+  onVerifiedCheckout?: () => void;
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({
@@ -18,8 +19,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   onClose,
   pendingVehicleData,
   initialTab = 'customer',
+  onVerifiedCheckout,
 }) => {
-  const { setCurrentUser, loginAdmin, createOrder } = useOrders();
+  const { setCurrentUser, loginAdmin, isPhoneBlacklisted, createOrder } = useOrders();
   const { cart, subtotal, tax, total, clearCart, closeDrawer } = useCart();
 
   const [activeTab, setActiveTab] = useState<'customer' | 'staff'>(initialTab);
@@ -29,6 +31,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [phone, setPhone] = useState('97244 08033');
   const [email, setEmail] = useState('kavya@example.com');
 
+  // WhatsApp OTP Verification Step
+  const [step, setStep] = useState<'details' | 'otp'>('details');
+  const [otp, setOtp] = useState('');
+  const [otpError, setOtpError] = useState(false);
+  const [otpSentNotification, setOtpSentNotification] = useState(false);
+
   // Staff Form State
   const [adminEmail, setAdminEmail] = useState('admin@gmail.com');
   const [adminPassword, setAdminPassword] = useState('admin');
@@ -36,40 +44,65 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 
   if (!isOpen) return null;
 
-  const handleCustomerSubmit = (e: React.FormEvent) => {
+  const handleSendOtp = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !phone || !email) return;
 
-    // Check if user accidentally entered admin email in customer tab
     if (email.trim().toLowerCase() === 'admin@gmail.com') {
       setActiveTab('staff');
       return;
     }
 
-    const user = { name: name.trim(), phone: phone.trim(), email: email.trim() };
-    setCurrentUser(user);
-    localStorage.setItem('greydot-user', JSON.stringify(user));
+    // Trigger WhatsApp OTP step
+    setStep('otp');
+    setOtpSentNotification(true);
+    setOtpError(false);
+  };
 
-    // If there was a pending order in cart, place it now
-    if (cart.length > 0) {
-      const cartItemsFormatted = cart.map(ci => ({
-        id: ci.item.id,
-        name: ci.item.name,
-        price: ci.item.price,
-        quantity: ci.quantity,
-        image: ci.item.image,
-      }));
+  const handleVerifyOtp = (e: React.FormEvent) => {
+    e.preventDefault();
 
-      createOrder(
-        pendingVehicleData || { carType: '', carPlate: '' },
-        cartItemsFormatted,
-        { subtotal, tax, total }
-      );
-      clearCart();
-      closeDrawer();
+    // In demo / staging: Accept standard OTP 4242 or any 4 digits
+    if (otp.trim() === '4242' || (otp.length === 4 && /^\d+$/.test(otp))) {
+      setOtpError(false);
+      const isBlacklisted = isPhoneBlacklisted(phone);
+
+      const user = {
+        name: name.trim(),
+        phone: phone.trim(),
+        email: email.trim(),
+        isVerified: true,
+        isFlagged: isBlacklisted,
+      };
+
+      setCurrentUser(user);
+      localStorage.setItem('greydot-user', JSON.stringify(user));
+
+      if (onVerifiedCheckout) {
+        onVerifiedCheckout();
+      } else if (cart.length > 0) {
+        // If there was an active checkout, place it
+        const cartItemsFormatted = cart.map(ci => ({
+          id: ci.item.id,
+          name: ci.item.name,
+          price: ci.item.price,
+          quantity: ci.quantity,
+          image: ci.item.image,
+        }));
+
+        createOrder(
+          pendingVehicleData || { carType: '', carPlate: '' },
+          cartItemsFormatted,
+          { subtotal, tax, total }
+        );
+        clearCart();
+        closeDrawer();
+      }
+
+      onClose();
+    } else {
+      setOtpError(true);
     }
-
-    onClose();
   };
 
   const handleAdminSubmit = (e: React.FormEvent) => {
@@ -103,7 +136,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </button>
 
         {/* Brand Header */}
-        <div className="text-center mb-6">
+        <div className="text-center mb-5">
           <div className="relative h-9 w-32 mx-auto mb-2">
             <Image
               src="/grey_dot_logo_straight.png"
@@ -117,11 +150,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </p>
         </div>
 
-        {/* Sign In Mode Selector Tabs */}
-        <div className="grid grid-cols-2 p-1 rounded-xl bg-concrete-100 dark:bg-white/5 border border-concrete-200 dark:border-white/10 mb-6 text-xs font-bold">
+        {/* Mode Selector Tabs (Customer vs Staff) */}
+        <div className="grid grid-cols-2 p-1 rounded-xl bg-concrete-100 dark:bg-white/5 border border-concrete-200 dark:border-white/10 mb-5 text-xs font-bold">
           <button
             type="button"
-            onClick={() => setActiveTab('customer')}
+            onClick={() => {
+              setActiveTab('customer');
+              setStep('details');
+            }}
             className={`py-2 px-3 rounded-lg transition flex items-center justify-center gap-1.5 ${
               activeTab === 'customer'
                 ? 'bg-brand-sky text-black shadow-sm'
@@ -146,9 +182,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           </button>
         </div>
 
-        {/* TAB 1: CUSTOMER SIGN IN */}
-        {activeTab === 'customer' && (
-          <form onSubmit={handleCustomerSubmit} className="space-y-4">
+        {/* ======================================================== */}
+        {/* TAB 1: CUSTOMER SIGN-IN WITH WHATSAPP OTP VERIFICATION */}
+        {/* ======================================================== */}
+        {activeTab === 'customer' && step === 'details' && (
+          <form onSubmit={handleSendOtp} className="space-y-3.5">
             <div>
               <label className="block text-xs font-bold text-concrete-700 dark:text-zinc-300 mb-1">
                 Your Full Name
@@ -159,16 +197,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 placeholder="e.g. Kavya Patel"
                 value={name}
                 onChange={e => setName(e.target.value)}
-                className="w-full bg-concrete-50 dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-concrete-900 dark:text-white focus:outline-none focus:border-brand-sky transition"
+                className="w-full bg-concrete-50 dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-concrete-900 dark:text-white focus:outline-none focus:border-brand-sky transition"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-bold text-concrete-700 dark:text-zinc-300 mb-1">
-                WhatsApp / Mobile Number
+              <label className="block text-xs font-bold text-concrete-700 dark:text-zinc-300 mb-1 flex items-center justify-between">
+                <span>WhatsApp / Mobile Number</span>
+                <span className="text-[10px] text-brand-sky font-semibold">Instant OTP Protection</span>
               </label>
               <div className="flex gap-2">
-                <span className="px-3.5 py-3 rounded-xl border border-concrete-300 dark:border-white/10 bg-concrete-100 dark:bg-white/5 text-sm font-bold text-concrete-600 dark:text-zinc-400 flex items-center">
+                <span className="px-3.5 py-2.5 rounded-xl border border-concrete-300 dark:border-white/10 bg-concrete-100 dark:bg-white/5 text-sm font-bold text-concrete-600 dark:text-zinc-400 flex items-center">
                   +91
                 </span>
                 <input
@@ -177,12 +216,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                   placeholder="98765 43210"
                   value={phone}
                   onChange={e => setPhone(e.target.value)}
-                  className="w-full bg-concrete-50 dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-concrete-900 dark:text-white focus:outline-none focus:border-brand-sky transition flex-1"
+                  className="w-full bg-concrete-50 dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-concrete-900 dark:text-white focus:outline-none focus:border-brand-sky transition flex-1 font-mono"
                 />
               </div>
-              <span className="text-[11px] text-concrete-500 dark:text-zinc-500 mt-1 block">
-                We will text your live token to this number.
-              </span>
             </div>
 
             <div>
@@ -195,7 +231,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 placeholder="kavya@gmail.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
-                className="w-full bg-concrete-50 dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-concrete-900 dark:text-white focus:outline-none focus:border-brand-sky transition"
+                className="w-full bg-concrete-50 dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-concrete-900 dark:text-white focus:outline-none focus:border-brand-sky transition"
               />
             </div>
 
@@ -204,20 +240,115 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 type="submit"
                 className="w-full py-3.5 text-sm font-bold rounded-xl bg-brand-sky hover:bg-brand-skyDark text-black shadow-lg shadow-brand-sky/20 transition-all flex items-center justify-center gap-2"
               >
-                <span>{cart.length > 0 ? 'Confirm & Place Drive-Thru Order →' : 'Sign In as Customer →'}</span>
+                <MessageSquare className="w-4 h-4" />
+                <span>Verify Mobile via WhatsApp OTP →</span>
               </button>
             </div>
 
             <div className="text-center pt-1">
               <p className="text-[11px] text-concrete-500 dark:text-zinc-500 flex items-center justify-center gap-1.5">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
-                <span>No advance payment needed · Pay at Drive-Thru Window</span>
+                <span>A 4-digit security code will be sent to confirm your car pickup</span>
               </p>
             </div>
           </form>
         )}
 
-        {/* TAB 2: STAFF / BARISTA LOGIN */}
+        {/* STEP 2: WHATSAPP OTP INPUT SCREEN */}
+        {activeTab === 'customer' && step === 'otp' && (
+          <form onSubmit={handleVerifyOtp} className="space-y-4">
+            
+            {/* Simulated WhatsApp notification banner */}
+            {otpSentNotification && (
+              <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs flex items-center justify-between gap-2 animate-in slide-in-from-top-2">
+                <div className="flex items-center gap-2">
+                  <span className="text-base">💬</span>
+                  <div>
+                    <span className="font-bold block">WhatsApp Message Received</span>
+                    <span className="text-[11px] text-concrete-600 dark:text-zinc-300">Your Grey Dot OTP is: <strong className="font-mono font-bold text-emerald-500">4242</strong></span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setOtp('4242')}
+                  className="px-2.5 py-1 rounded-lg bg-emerald-500 text-black font-bold text-[10px] hover:bg-emerald-400 transition"
+                >
+                  Use Code
+                </button>
+              </div>
+            )}
+
+            <div className="text-center">
+              <div className="w-12 h-12 rounded-2xl bg-brand-sky/10 border border-brand-sky/20 text-brand-sky flex items-center justify-center text-xl mx-auto mb-2">
+                📱
+              </div>
+              <h3 className="font-bold text-base text-concrete-900 dark:text-white">
+                Enter WhatsApp OTP
+              </h3>
+              <p className="text-xs text-concrete-500 dark:text-zinc-400 mt-1">
+                Sent 4-digit code to <strong className="text-concrete-900 dark:text-white font-mono">+91 {phone}</strong>
+              </p>
+            </div>
+
+            {otpError && (
+              <div className="p-3 rounded-xl bg-red-500/10 border border-red-500/30 text-red-500 text-xs flex items-center gap-2 font-medium">
+                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                <span>Invalid OTP. Please enter 4242</span>
+              </div>
+            )}
+
+            <div>
+              <input
+                required
+                type="text"
+                maxLength={4}
+                autoFocus
+                placeholder="• • • •"
+                value={otp}
+                onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
+                className="w-full text-center tracking-[1em] text-2xl font-mono font-black py-3 rounded-2xl bg-concrete-50 dark:bg-noir-card border-2 border-concrete-300 dark:border-white/10 focus:border-brand-sky focus:outline-none text-concrete-900 dark:text-white transition"
+              />
+            </div>
+
+            <div className="flex items-center justify-between text-xs text-concrete-500 dark:text-zinc-400 px-1">
+              <button
+                type="button"
+                onClick={() => setStep('details')}
+                className="flex items-center gap-1 hover:text-brand-sky transition"
+              >
+                <ArrowLeft className="w-3 h-3" />
+                <span>Change Number</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => {
+                  setOtp('4242');
+                  setOtpSentNotification(true);
+                }}
+                className="text-brand-sky font-bold hover:underline flex items-center gap-1"
+              >
+                <Sparkles className="w-3 h-3" />
+                <span>Resend / Auto-Fill (4242)</span>
+              </button>
+            </div>
+
+            <div className="pt-2">
+              <button
+                type="submit"
+                disabled={otp.length !== 4}
+                className="w-full py-3.5 text-sm font-bold rounded-xl bg-brand-sky hover:bg-brand-skyDark text-black shadow-lg shadow-brand-sky/20 transition-all disabled:opacity-40 flex items-center justify-center gap-2"
+              >
+                <CheckCircle2 className="w-4 h-4" />
+                <span>Verify & Confirm Identity →</span>
+              </button>
+            </div>
+          </form>
+        )}
+
+        {/* ======================================================== */}
+        {/* TAB 2: STAFF / BARISTA LOGIN                             */}
+        {/* ======================================================== */}
         {activeTab === 'staff' && (
           <form onSubmit={handleAdminSubmit} className="space-y-4">
             <div className="text-center mb-2">
@@ -242,7 +373,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 type="email"
                 value={adminEmail}
                 onChange={e => setAdminEmail(e.target.value)}
-                className="w-full bg-concrete-50 dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-concrete-900 dark:text-white focus:outline-none focus:border-brand-sky transition font-mono"
+                className="w-full bg-concrete-50 dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-concrete-900 dark:text-white focus:outline-none focus:border-brand-sky transition font-mono"
               />
             </div>
 
@@ -255,7 +386,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 type="password"
                 value={adminPassword}
                 onChange={e => setAdminPassword(e.target.value)}
-                className="w-full bg-concrete-50 dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-4 py-3 text-sm text-concrete-900 dark:text-white focus:outline-none focus:border-brand-sky transition font-mono"
+                className="w-full bg-concrete-50 dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-concrete-900 dark:text-white focus:outline-none focus:border-brand-sky transition font-mono"
               />
             </div>
 
@@ -290,10 +421,6 @@ export const AuthModal: React.FC<AuthModalProps> = ({
                 <span>Enter Barista KDS Screen 🔓</span>
               </button>
             </div>
-
-            <p className="text-center text-[11px] text-concrete-500 dark:text-zinc-500">
-              Entering admin credentials will lock the interface to the Barista Display only.
-            </p>
           </form>
         )}
 

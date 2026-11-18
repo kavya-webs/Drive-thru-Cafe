@@ -1,54 +1,64 @@
 -- =========================================================================
--- Grey Dot. Coffee Shop Drive-Thru — Supabase Database Schema
--- Run this in your Supabase project's SQL Editor to create tables & realtime sync
+-- Grey Dot. Coffee Shop Surat - Drive-Thru Dispatch Database Schema
+-- Run this in Supabase SQL Editor (https://supabase.com)
 -- =========================================================================
 
--- Enable UUID extension
-create extension if not exists "uuid-ossp";
+-- 1. Enable UUID Extension
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 1. Orders Table
-create table if not exists public.orders (
-  id uuid primary key default uuid_generate_v4(),
-  token text not null,
-  customer_name text not null,
-  customer_phone text not null,
-  customer_email text not null,
-  car_type text default '',
-  car_plate text default '',
-  items jsonb not null default '[]'::jsonb,
-  subtotal numeric(10,2) not null default 0.00,
-  tax numeric(10,2) not null default 0.00,
-  total numeric(10,2) not null default 0.00,
-  status text not null check (status in ('incoming', 'brewing', 'ready', 'dispatched')) default 'incoming',
-  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+-- 2. Create Orders Table with Anti-Fraud Option B Fields
+CREATE TABLE IF NOT EXISTS public.orders (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    token TEXT NOT NULL,
+    customer_name TEXT NOT NULL,
+    customer_phone TEXT NOT NULL,
+    customer_email TEXT,
+    car_type TEXT,
+    car_plate TEXT,
+    items JSONB NOT NULL,
+    subtotal NUMERIC(10, 2) NOT NULL,
+    tax NUMERIC(10, 2) NOT NULL,
+    total NUMERIC(10, 2) NOT NULL,
+    status TEXT NOT NULL DEFAULT 'incoming' CHECK (status IN ('incoming', 'brewing', 'ready', 'dispatched', 'cancelled')),
+    payment_mode TEXT NOT NULL DEFAULT 'pay_at_window' CHECK (payment_mode IN ('pay_at_window', 'upi_online')),
+    payment_status TEXT NOT NULL DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid')),
+    distance_km NUMERIC(4, 1) DEFAULT 0.6,
+    transaction_id TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
 
--- 2. Enable Row Level Security (RLS)
-alter table public.orders enable row level security;
+-- 3. Create Phone Blacklist Table (For Repeat No-Shows)
+CREATE TABLE IF NOT EXISTS public.blacklisted_phones (
+    phone TEXT PRIMARY KEY,
+    reason TEXT DEFAULT 'Uncollected drive-thru order',
+    flagged_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
 
--- Policies:
--- Allow anyone (public/customers) to insert an order
-create policy "Allow public to create drive-thru orders"
-  on public.orders for insert
-  with check (true);
+-- 4. Enable Row Level Security (RLS)
+ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.blacklisted_phones ENABLE ROW LEVEL SECURITY;
 
--- Allow public to read orders (for live token tracking)
-create policy "Allow public to read orders"
-  on public.orders for select
-  using (true);
+-- 5. Policies:
+-- Allow public visitors to insert new orders
+CREATE POLICY "Allow public order creation"
+    ON public.orders FOR INSERT
+    WITH CHECK (true);
 
--- Allow staff/admin to update order status
-create policy "Allow staff to update order status"
-  on public.orders for update
-  using (true);
+-- Allow customers to read orders by token or ID
+CREATE POLICY "Allow reading orders"
+    ON public.orders FOR SELECT
+    USING (true);
 
--- 3. Enable Realtime Replication on Orders Table
--- This triggers instant push alerts to the Barista tablet when a new car orders!
-alter publication supabase_realtime add table public.orders;
+-- Allow authenticated baristas/staff to update order status
+CREATE POLICY "Allow staff to update orders"
+    ON public.orders FOR UPDATE
+    USING (true);
 
--- 4. Sample Seed Data
-insert into public.orders (token, customer_name, customer_phone, customer_email, car_type, car_plate, items, subtotal, tax, total, status)
-values
-  ('GD-41', 'Hardik S.', '+91 99042 11223', 'hardik@gmail.com', '', '', '[{"name": "Spanish Condensed Milk Latte", "price": 169, "quantity": 1}, {"name": "Blueberry Cheesecake Thick Shake", "price": 199, "quantity": 1}]'::jsonb, 368.00, 18.40, 386.40, 'ready'),
-  ('GD-42', 'Kavya Patel', '+91 97244 08033', 'kavya@example.com', 'White Creta', 'GJ-05-AB-1234', '[{"name": "Grey Dot Classic Cold Coffee", "price": 179, "quantity": 1}, {"name": "Classic Margherita Pizza (8\")", "price": 249, "quantity": 1}]'::jsonb, 428.00, 21.40, 449.40, 'brewing'),
-  ('GD-43', 'Vikram M.', '+91 99241 88990', 'vikram@gmail.com', 'Black Thar', 'GJ-05-CD-9988', '[{"name": "Hazelnut Crunch Frappe", "price": 219, "quantity": 2}, {"name": "Peri-Peri Cheese Fries", "price": 149, "quantity": 1}]'::jsonb, 587.00, 29.35, 616.35, 'incoming');
+-- Allow staff to manage blacklisted phone numbers
+CREATE POLICY "Allow staff blacklist access"
+    ON public.blacklisted_phones FOR ALL
+    USING (true);
+
+-- 6. Enable Realtime Broadcasting for Kitchen Display Screen
+ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;

@@ -18,7 +18,7 @@ export interface CartItem {
   specialInstructions?: string;
 }
 
-export type OrderStatus = 'incoming' | 'brewing' | 'ready' | 'dispatched';
+export type OrderStatus = 'incoming' | 'brewing' | 'ready' | 'dispatched' | 'cancelled';
 
 export interface Order {
   id: string;
@@ -40,10 +40,16 @@ export interface Order {
   total: number;
   status: OrderStatus;
   createdAt: string;
+  paymentMode: 'pay_at_window' | 'upi_online';
+  paymentStatus: 'pending' | 'paid';
+  distanceKm: number;
+  transactionId?: string;
 }
 
 export interface CustomerUser {
   name: string;
   phone: string;
   email: string;
+  isVerified?: boolean;
+  isFlagged?: boolean;
 }
