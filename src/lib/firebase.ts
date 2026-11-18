@@ -1,91 +1,154 @@
-import { initializeApp, getApps, getApp } from 'firebase/app';
-import { 
-  getFirestore, 
-  collection, 
-  doc, 
-  setDoc, 
-  updateDoc, 
-  onSnapshot, 
-  query, 
-  orderBy, 
-  deleteDoc,
-  getDocs,
-  Timestamp 
-} from 'firebase/firestore';
 import { Order, OrderStatus } from '@/types';
 
-const firebaseConfig = {
-  apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "AIzaSyDcBa5e7NetB1_N8SstMIE9yqzQxiuVhmo",
-  authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "greydot-cafe-surat.firebaseapp.com",
-  projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "greydot-cafe-surat",
-  storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "greydot-cafe-surat.firebasestorage.app",
-  messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "170925969087",
-  appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:170925969087:web:c1b0c6059492cc0aa7400a"
-};
+const FIRESTORE_BASE_URL = 'https://firestore.googleapis.com/v1/projects/greydot-cafe-surat/databases/(default)/documents';
 
-const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-export const db = getFirestore(app);
+// Helper to convert Firestore REST fields format to Order
+function parseFirestoreDoc(doc: any): Order {
+  const f = doc.fields || {};
+  return {
+    id: f.id?.stringValue || doc.name.split('/').pop(),
+    token: f.token?.stringValue || '',
+    customerName: f.customerName?.stringValue || '',
+    customerPhone: f.customerPhone?.stringValue || '',
+    customerEmail: f.customerEmail?.stringValue || '',
+    carType: f.carType?.stringValue || '',
+    carPlate: f.carPlate?.stringValue || '',
+    items: f.itemsJson?.stringValue ? JSON.parse(f.itemsJson.stringValue) : [],
+    subtotal: f.subtotal?.doubleValue ?? Number(f.subtotal?.integerValue || 0),
+    tax: f.tax?.doubleValue ?? Number(f.tax?.integerValue || 0),
+    total: f.total?.doubleValue ?? Number(f.total?.integerValue || 0),
+    status: (f.status?.stringValue || 'incoming') as OrderStatus,
+    createdAt: f.createdAt?.stringValue || '',
+    paymentMode: (f.paymentMode?.stringValue || 'pay_at_window') as any,
+    distanceKm: f.distanceKm?.doubleValue ?? Number(f.distanceKm?.integerValue || 0.6),
+  };
+}
 
-// Save or create an order in Firestore
+// Fetch all orders from Cloud Firestore via REST
+export async function fetchOrdersFromFirestore(): Promise<Order[]> {
+  try {
+    const res = await fetch(`${FIRESTORE_BASE_URL}/orders`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+      cache: 'no-store'
+    });
+    if (!res.ok) {
+      if (res.status === 404) return [];
+      console.warn('Firestore fetch failed status:', res.status);
+      return [];
+    }
+    const data = await res.json();
+    if (!data.documents || !Array.isArray(data.documents)) {
+      return [];
+    }
+    const orders = data.documents.map(parseFirestoreDoc);
+    // Sort newest first
+    orders.sort((a: Order, b: Order) => {
+      return b.id.localeCompare(a.id);
+    });
+    return orders;
+  } catch (err) {
+    console.error('Error fetching orders from Firestore REST:', err);
+    return [];
+  }
+}
+
+// Save order to Cloud Firestore via REST
 export async function saveOrderToFirestore(order: Order): Promise<void> {
   try {
-    const orderRef = doc(db, 'orders', order.id);
-    await setDoc(orderRef, {
-      ...order,
-      updatedAt: Date.now(),
-    }, { merge: true });
+    const body = {
+      fields: {
+        id: { stringValue: order.id },
+        token: { stringValue: order.token },
+        customerName: { stringValue: order.customerName },
+        customerPhone: { stringValue: order.customerPhone },
+        customerEmail: { stringValue: order.customerEmail },
+        carType: { stringValue: order.carType || '' },
+        carPlate: { stringValue: order.carPlate || '' },
+        subtotal: { doubleValue: order.subtotal },
+        tax: { doubleValue: order.tax },
+        total: { doubleValue: order.total },
+        status: { stringValue: order.status },
+        createdAt: { stringValue: order.createdAt },
+        paymentMode: { stringValue: order.paymentMode },
+        distanceKm: { doubleValue: order.distanceKm },
+        itemsJson: { stringValue: JSON.stringify(order.items) },
+        timestamp: { integerValue: String(Date.now()) }
+      }
+    };
+
+    const res = await fetch(`${FIRESTORE_BASE_URL}/orders?documentId=${encodeURIComponent(order.id)}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+      console.error('Failed to save order to Firestore REST:', res.status, await res.text());
+    }
   } catch (error) {
-    console.error('Error saving order to Firestore:', error);
+    console.error('Error saving order to Firestore REST:', error);
   }
 }
 
-// Update order status in Firestore
+// Update order status in Cloud Firestore via REST
 export async function updateOrderStatusInFirestore(orderId: string, status: OrderStatus): Promise<void> {
   try {
-    const orderRef = doc(db, 'orders', orderId);
-    await updateDoc(orderRef, {
-      status,
-      updatedAt: Date.now(),
+    const body = {
+      fields: {
+        status: { stringValue: status },
+        timestamp: { integerValue: String(Date.now()) }
+      }
+    };
+
+    await fetch(`${FIRESTORE_BASE_URL}/orders/${encodeURIComponent(orderId)}?updateMask.fieldPaths=status&updateMask.fieldPaths=timestamp`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
     });
   } catch (error) {
-    console.error('Error updating order in Firestore:', error);
+    console.error('Error updating order status in Firestore REST:', error);
   }
 }
 
-// Subscribe to all orders in real time
+// Real-time synchronization polling (ultra lightweight, 2.5s interval)
 export function subscribeToOrders(
   onOrdersUpdated: (orders: Order[]) => void
 ): () => void {
-  try {
-    const ordersCol = collection(db, 'orders');
-    // Order by createdAt timestamp descending so newest orders arrive first
-    const q = query(ordersCol);
+  let isMounted = true;
 
-    return onSnapshot(q, (snapshot) => {
-      const ordersList: Order[] = [];
-      snapshot.forEach((docSnapshot) => {
-        ordersList.push(docSnapshot.data() as Order);
-      });
-      // Sort in-memory by createdAt descending
-      ordersList.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-      onOrdersUpdated(ordersList);
-    }, (error) => {
-      console.error('Firestore onSnapshot orders error:', error);
-    });
-  } catch (e) {
-    console.error('Failed to subscribe to orders:', e);
-    return () => {};
-  }
+  const poll = async () => {
+    if (!isMounted) return;
+    const orders = await fetchOrdersFromFirestore();
+    if (isMounted) {
+      onOrdersUpdated(orders);
+    }
+  };
+
+  // Immediate initial fetch
+  poll();
+
+  // 2.5s heartbeat
+  const intervalId = setInterval(poll, 2500);
+
+  return () => {
+    isMounted = false;
+    clearInterval(intervalId);
+  };
 }
 
-// Clear all completed/cancelled orders or reset queue
+// Clear all orders from Firestore
 export async function clearAllOrdersFromFirestore(): Promise<void> {
   try {
-    const ordersCol = collection(db, 'orders');
-    const snapshot = await getDocs(ordersCol);
-    const deletePromises = snapshot.docs.map(docSnap => deleteDoc(doc(db, 'orders', docSnap.id)));
-    await Promise.all(deletePromises);
+    const orders = await fetchOrdersFromFirestore();
+    await Promise.all(
+      orders.map(order => 
+        fetch(`${FIRESTORE_BASE_URL}/orders/${encodeURIComponent(order.id)}`, {
+          method: 'DELETE'
+        })
+      )
+    );
   } catch (error) {
-    console.error('Error clearing orders from Firestore:', error);
+    console.error('Error clearing orders from Firestore REST:', error);
   }
 }
