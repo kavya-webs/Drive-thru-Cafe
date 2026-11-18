@@ -23,11 +23,7 @@ interface CartContextType {
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export function CartProvider({ children }: { children: React.ReactNode }) {
-  // Prepopulate with 2 default favorites for smooth demo
-  const [cart, setCart] = useState<CartItem[]>([
-    { item: MENU_ITEMS[0], quantity: 1 },
-    { item: MENU_ITEMS[2], quantity: 1 },
-  ]);
+  const [cart, setCart] = useState<CartItem[]>([]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
   const openDrawer = () => setIsDrawerOpen(true);

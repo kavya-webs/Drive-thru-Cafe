@@ -27,9 +27,9 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [activeTab, setActiveTab] = useState<'customer' | 'staff'>(initialTab);
 
   // Customer Form State
-  const [name, setName] = useState('Kavya Patel');
-  const [phone, setPhone] = useState('97244 08033');
-  const [email, setEmail] = useState('kavya@example.com');
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
 
   // WhatsApp OTP Verification Step
   const [step, setStep] = useState<'details' | 'otp'>('details');
@@ -38,8 +38,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   const [otpSentNotification, setOtpSentNotification] = useState(false);
 
   // Staff Form State
-  const [adminEmail, setAdminEmail] = useState('admin@gmail.com');
-  const [adminPassword, setAdminPassword] = useState('admin');
+  const [adminEmail, setAdminEmail] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
   const [adminError, setAdminError] = useState(false);
 
   if (!isOpen) return null;
@@ -194,7 +194,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <input
                 required
                 type="text"
-                placeholder="e.g. Kavya Patel"
+                placeholder="Enter your full name"
                 value={name}
                 onChange={e => setName(e.target.value)}
                 className="w-full bg-concrete-50 dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-concrete-900 dark:text-white focus:outline-none focus:border-brand-sky transition"
@@ -228,7 +228,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <input
                 required
                 type="email"
-                placeholder="kavya@gmail.com"
+                placeholder="name@gmail.com"
                 value={email}
                 onChange={e => setEmail(e.target.value)}
                 className="w-full bg-concrete-50 dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-concrete-900 dark:text-white focus:outline-none focus:border-brand-sky transition"
@@ -371,6 +371,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <input
                 required
                 type="email"
+                placeholder="admin@gmail.com"
                 value={adminEmail}
                 onChange={e => setAdminEmail(e.target.value)}
                 className="w-full bg-concrete-50 dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-concrete-900 dark:text-white focus:outline-none focus:border-brand-sky transition font-mono"
@@ -384,6 +385,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               <input
                 required
                 type="password"
+                placeholder="••••••••"
                 value={adminPassword}
                 onChange={e => setAdminPassword(e.target.value)}
                 className="w-full bg-concrete-50 dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-4 py-2.5 text-sm text-concrete-900 dark:text-white focus:outline-none focus:border-brand-sky transition font-mono"

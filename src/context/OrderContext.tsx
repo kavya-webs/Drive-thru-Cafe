@@ -33,74 +33,11 @@ interface OrderContextType {
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
-// Initial sample queue tickets for Barista KDS demonstration (All Physical Pay-at-Window)
-const INITIAL_DEMO_ORDERS: Order[] = [
-  {
-    id: 'ord-101',
-    token: 'GD-41',
-    customerName: 'Hardik S.',
-    customerPhone: '+91 99042 11223',
-    customerEmail: 'hardik@gmail.com',
-    carType: '',
-    carPlate: '',
-    items: [
-      { id: 'gd-spanish-latte', name: 'Spanish Condensed Milk Latte', price: 169, quantity: 1, image: '/images/spanish_latte.jpg' },
-      { id: 'gd-blueberry-shake', name: 'Blueberry Cheesecake Thick Shake', price: 199, quantity: 1, image: '/images/blueberry_shake.jpg' },
-    ],
-    subtotal: 368,
-    tax: 18.40,
-    total: 386.40,
-    status: 'ready',
-    createdAt: '12:30 PM',
-    paymentMode: 'pay_at_window',
-    distanceKm: 0.4,
-  },
-  {
-    id: 'ord-102',
-    token: 'GD-42',
-    customerName: 'Kavya Patel',
-    customerPhone: '+91 97244 08033',
-    customerEmail: 'kavya@example.com',
-    carType: 'White Creta',
-    carPlate: 'GJ-05-AB-1234',
-    items: [
-      { id: 'gd-cold-brew', name: 'Grey Dot Classic Cold Coffee', price: 179, quantity: 1, image: '/images/cold_coffee.jpg' },
-      { id: 'gd-margherita-pizza', name: 'Classic Margherita Pizza (8")', price: 249, quantity: 1, image: '/images/margherita_pizza.jpg' },
-    ],
-    subtotal: 428,
-    tax: 21.40,
-    total: 449.40,
-    status: 'brewing',
-    createdAt: '12:35 PM',
-    paymentMode: 'pay_at_window',
-    distanceKm: 0.8,
-  },
-  {
-    id: 'ord-103',
-    token: 'GD-43',
-    customerName: 'Vikram M.',
-    customerPhone: '+91 99241 88990',
-    customerEmail: 'vikram@gmail.com',
-    carType: 'Black Thar',
-    carPlate: 'GJ-05-CD-9988',
-    items: [
-      { id: 'gd-peri-peri-fries', name: 'Peri-Peri Cheese Fries', price: 149, quantity: 1, image: '/images/peri_peri_fries.jpg' },
-    ],
-    subtotal: 149,
-    tax: 7.45,
-    total: 156.45,
-    status: 'incoming',
-    createdAt: 'Just now',
-    paymentMode: 'pay_at_window',
-    distanceKm: 1.2,
-  },
-];
-
 export function OrderProvider({ children }: { children: React.ReactNode }) {
   const [currentUser, setCurrentUser] = useState<CustomerUser | null>(null);
   const [isAdminLoggedIn, setIsAdminLoggedIn] = useState(false);
-  const [orders, setOrders] = useState<Order[]>(INITIAL_DEMO_ORDERS);
-  const [activeOrder, setActiveOrder] = useState<Order | null>(INITIAL_DEMO_ORDERS[1]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [activeOrder, setActiveOrder] = useState<Order | null>(null);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
   
   // Geolocation simulation (Defaults to 0.6 km from Ram Chowk, Surat)
@@ -180,12 +117,8 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     const nextTokenNum = 44 + orders.length;
     const token = `GD-${nextTokenNum}`;
 
-    const itemsToUse = cartItems && cartItems.length > 0
-      ? cartItems
-      : [
-          { id: 'gd-cold-brew', name: 'Grey Dot Classic Cold Coffee', price: 179, quantity: 1, image: '/images/cold_coffee.jpg' },
-          { id: 'gd-margherita-pizza', name: 'Classic Margherita Pizza (8")', price: 249, quantity: 1, image: '/images/margherita_pizza.jpg' },
-        ];
+    const itemsToUse = cartItems && cartItems.length > 0 ? cartItems : [];
+    if (itemsToUse.length === 0) return null;
 
     const subtotal = pricing?.subtotal ?? itemsToUse.reduce((sum, item) => sum + item.price * item.quantity, 0);
     const tax = pricing?.tax ?? Number((subtotal * 0.05).toFixed(2));
