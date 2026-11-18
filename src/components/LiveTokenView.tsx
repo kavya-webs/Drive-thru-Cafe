@@ -170,22 +170,16 @@ export const LiveTokenView: React.FC<{ onNavigateToMenu: () => void }> = ({ onNa
 
       </div>
 
-      {/* Items Details & Payment Guarantee Card */}
+      {/* Items Details & Physical Payment Card */}
       <div className="p-6 rounded-3xl border border-concrete-300 dark:border-white/10 bg-white dark:bg-noir-card shadow-sm">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-bold text-concrete-900 dark:text-white">
             Order Items Summary
           </h3>
-          {activeOrder.paymentStatus === 'paid' ? (
-            <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>PAID IN ADVANCE VIA UPI</span>
-            </span>
-          ) : (
-            <span className="text-xs font-bold text-amber-500 bg-amber-500/10 px-2.5 py-0.5 rounded-full border border-amber-500/20">
-              PAY AT WINDOW
-            </span>
-          )}
+          <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 flex items-center gap-1">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            <span>PAY PHYSICALLY AT WINDOW</span>
+          </span>
         </div>
 
         <div className="space-y-2 text-xs">
@@ -202,7 +196,7 @@ export const LiveTokenView: React.FC<{ onNavigateToMenu: () => void }> = ({ onNa
           ))}
 
           <div className="flex justify-between pt-2 text-sm font-bold text-concrete-900 dark:text-white">
-            <span>{activeOrder.paymentStatus === 'paid' ? 'Total Paid' : 'Total Payable at Window'}</span>
+            <span>Total Payable upon Handover</span>
             <span className="text-brand-sky font-mono text-base font-black">
               ₹{activeOrder.total.toFixed(2)}
             </span>
@@ -213,14 +207,10 @@ export const LiveTokenView: React.FC<{ onNavigateToMenu: () => void }> = ({ onNa
           <CreditCard className="w-5 h-5 text-emerald-500 flex-shrink-0" />
           <div>
             <span className="font-bold text-concrete-900 dark:text-white block">
-              {activeOrder.paymentStatus === 'paid'
-                ? `Transaction ID: ${activeOrder.transactionId || 'UPI-VERIFIED'}`
-                : 'Pay at drive-thru window upon collection'}
+              Pay physically at the drive-thru window upon collection
             </span>
             <span className="text-concrete-500 dark:text-zinc-400">
-              {activeOrder.paymentStatus === 'paid'
-                ? 'Your order is pre-paid. Simply flash this screen or say your token number for zero-wait handover.'
-                : 'Pay via UPI QR scan, cash, or card when you pull up to the window.'}
+              Pay via UPI QR scan, cash, or card directly at the counter when you pull up to Lane 1.
             </span>
           </div>
         </div>

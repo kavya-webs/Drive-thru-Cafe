@@ -10,20 +10,15 @@ import {
   Car, 
   LogOut, 
   PlusCircle, 
-  AlertCircle, 
   Volume2, 
   VolumeX, 
   Sun, 
   Moon, 
   Flame, 
   CheckCheck,
-  Sparkles,
-  ShoppingBag,
-  ShieldCheck,
-  ShieldAlert,
   UserX,
   CreditCard,
-  Phone
+  ShieldAlert
 } from 'lucide-react';
 import { playChimeSound, playReadyAlert } from '@/lib/audio';
 
@@ -109,7 +104,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
                 </span>
               </div>
               <p className="text-[11px] text-concrete-500 dark:text-zinc-400">
-                Ram Chowk, Mota Varachha · Anti-Fraud Protected (Option B)
+                Ram Chowk, Mota Varachha · Physical Payment Counter
               </p>
             </div>
           </div>
@@ -140,10 +135,10 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
             <button
               onClick={() => setShowBlacklistDrawer(!showBlacklistDrawer)}
               className="px-2.5 py-1.5 rounded-xl border border-red-500/20 bg-red-500/10 text-red-500 text-xs font-bold hover:bg-red-500/20 transition flex items-center gap-1"
-              title="View No-Show Blocked Numbers"
+              title="View No-Show Flagged Numbers"
             >
               <UserX className="w-3.5 h-3.5" />
-              <span>Blocked: {blacklistedPhones.length}</span>
+              <span>Flagged: {blacklistedPhones.length}</span>
             </button>
 
             {/* Sound Toggle */}
@@ -234,7 +229,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
                     key={ord.id}
                     className="p-4 rounded-2xl border-l-4 border-l-brand-sky border-y border-r border-concrete-300 dark:border-white/10 bg-white dark:bg-noir-surface shadow-md space-y-3"
                   >
-                    {/* Ticket Header & Payment Status */}
+                    {/* Ticket Header */}
                     <div className="flex items-start justify-between">
                       <div>
                         <div className="flex items-center gap-2">
@@ -283,17 +278,9 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
                         </span>
                       )}
 
-                      {/* Payment Badge */}
-                      {ord.paymentStatus === 'paid' ? (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                          <CheckCircle className="w-3 h-3" />
-                          <span>PAID VIA UPI ({ord.transactionId?.slice(0, 10)})</span>
-                        </span>
-                      ) : (
-                        <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded bg-sky-500/15 text-sky-600 dark:text-brand-sky border border-sky-500/30">
-                          <span>COLLECT AT WINDOW (₹{ord.total.toFixed(2)})</span>
-                        </span>
-                      )}
+                      <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-0.5 rounded bg-sky-500/15 text-sky-600 dark:text-brand-sky border border-sky-500/30">
+                        <span>COLLECT AT WINDOW (₹{ord.total.toFixed(2)})</span>
+                      </span>
                     </div>
 
                     {/* Ordered Items List */}
@@ -318,7 +305,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
                     {/* Total & Action Buttons */}
                     <div className="flex items-center justify-between pt-1">
                       <div>
-                        <span className="text-[10px] text-concrete-500 dark:text-zinc-400 block font-semibold">TOTAL AMOUNT</span>
+                        <span className="text-[10px] text-concrete-500 dark:text-zinc-400 block font-semibold">COLLECT AT WINDOW</span>
                         <span className="text-sm font-black font-mono text-concrete-900 dark:text-white">
                           ₹{ord.total.toFixed(2)}
                         </span>
@@ -408,15 +395,9 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
                         </span>
                       )}
 
-                      {ord.paymentStatus === 'paid' ? (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-500">
-                          PAID ONLINE
-                        </span>
-                      ) : (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-500/15 text-brand-sky">
-                          COLLECT AT WINDOW
-                        </span>
-                      )}
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-sky-500/15 text-brand-sky">
+                        COLLECT AT WINDOW (₹{ord.total.toFixed(2)})
+                      </span>
                     </div>
 
                     <div className="space-y-1.5 py-2 border-y border-concrete-200 dark:border-white/10 text-xs">
@@ -526,15 +507,9 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
                         </span>
                       )}
 
-                      {ord.paymentStatus === 'paid' ? (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
-                          PAID VIA UPI ({ord.transactionId?.slice(0, 10)})
-                        </span>
-                      ) : (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-500 border border-amber-500/30">
-                          COLLECT AT WINDOW (₹{ord.total.toFixed(2)})
-                        </span>
-                      )}
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-500 border border-amber-500/30">
+                        COLLECT AT WINDOW (₹{ord.total.toFixed(2)})
+                      </span>
                     </div>
 
                     <div className="space-y-1.5 py-2 border-y border-concrete-200 dark:border-white/10 text-xs">
@@ -559,7 +534,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
                     <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2 pt-1">
                       <div>
                         <span className="text-[10px] text-concrete-500 dark:text-zinc-400 block font-semibold">
-                          {ord.paymentStatus === 'paid' ? 'PAID TOTAL' : 'DUE AT WINDOW'}
+                          COLLECT AT WINDOW
                         </span>
                         <span className="text-sm font-black font-mono text-emerald-600 dark:text-emerald-400">
                           ₹{ord.total.toFixed(2)}
@@ -567,24 +542,22 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
                       </div>
 
                       <div className="flex items-center gap-2">
-                        {/* OPTION B PROTECTION: No-show reporting */}
-                        {ord.paymentStatus !== 'paid' && (
-                          <button
-                            onClick={() => markNoShow(ord.id)}
-                            className="px-2.5 py-2 rounded-xl text-[11px] font-bold border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/20 transition flex items-center gap-1"
-                            title="Mark customer as no-show and block phone from Pay at Window"
-                          >
-                            <UserX className="w-3.5 h-3.5" />
-                            <span>No-Show / Cancel</span>
-                          </button>
-                        )}
+                        {/* No-show reporting to blacklist fake orders */}
+                        <button
+                          onClick={() => markNoShow(ord.id)}
+                          className="px-2.5 py-2 rounded-xl text-[11px] font-bold border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/20 transition flex items-center gap-1"
+                          title="Mark customer as no-show and blacklist phone"
+                        >
+                          <UserX className="w-3.5 h-3.5" />
+                          <span>No-Show / Cancel</span>
+                        </button>
 
                         <button
                           onClick={() => handleStatusChange(ord.id, 'dispatched')}
                           className="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-500 hover:bg-emerald-600 text-black shadow-md transition flex items-center justify-center gap-1.5 flex-1 sm:flex-initial"
                         >
                           <CheckCheck className="w-3.5 h-3.5" />
-                          <span>Handed Over ✅</span>
+                          <span>Handed Over & Paid ✅</span>
                         </button>
                       </div>
                     </div>
@@ -599,7 +572,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
 
       </main>
 
-      {/* OPTION B: BLACKLISTED NUMBERS SLIDE-OVER MODAL */}
+      {/* BLACKLISTED NUMBERS SLIDE-OVER MODAL */}
       {showBlacklistDrawer && (
         <div className="fixed inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center p-4">
           <div className="max-w-md w-full rounded-3xl border border-red-500/30 bg-white dark:bg-noir-surface p-6 shadow-2xl relative">
@@ -611,10 +584,10 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
             </button>
             <div className="flex items-center gap-2 text-red-500 mb-2 font-bold text-sm">
               <ShieldAlert className="w-5 h-5" />
-              <span>Anti-Fraud Blacklist (No-Show Protection)</span>
+              <span>No-Show Blacklist (Physical Fraud Protection)</span>
             </div>
             <p className="text-xs text-concrete-500 dark:text-zinc-400 mb-4">
-              Phone numbers flagged for uncollected orders are permanently blocked from "Pay at Window" and must pay via UPI upfront.
+              Phone numbers flagged for uncollected orders will be blocked from placing drive-thru orders.
             </p>
             <div className="max-h-60 overflow-y-auto space-y-2 mb-4">
               {blacklistedPhones.length === 0 ? (
@@ -625,7 +598,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
                 blacklistedPhones.map((p, idx) => (
                   <div key={idx} className="p-2.5 rounded-xl border border-red-500/20 bg-red-500/10 flex items-center justify-between text-xs font-mono">
                     <span className="text-red-500 font-bold">{p}</span>
-                    <span className="text-[10px] text-red-400">Blocked from Cash</span>
+                    <span className="text-[10px] text-red-400">Blocked</span>
                   </div>
                 ))
               )}

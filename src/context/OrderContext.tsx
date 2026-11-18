@@ -24,12 +24,7 @@ interface OrderContextType {
   createOrder: (
     vehicleData: { carType?: string; carPlate?: string },
     cartItems?: { id: string; name: string; price: number; quantity: number; image: string }[],
-    pricing?: { subtotal: number; tax: number; total: number },
-    paymentInfo?: {
-      paymentMode: 'pay_at_window' | 'upi_online';
-      paymentStatus: 'pending' | 'paid';
-      transactionId?: string;
-    }
+    pricing?: { subtotal: number; tax: number; total: number }
   ) => Order | null;
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
   simulateIncomingOrder: () => void;
@@ -37,7 +32,7 @@ interface OrderContextType {
 
 const OrderContext = createContext<OrderContextType | undefined>(undefined);
 
-// Initial sample queue tickets for Barista KDS demonstration
+// Initial sample queue tickets for Barista KDS demonstration (All Physical Pay-at-Window)
 const INITIAL_DEMO_ORDERS: Order[] = [
   {
     id: 'ord-101',
@@ -56,10 +51,8 @@ const INITIAL_DEMO_ORDERS: Order[] = [
     total: 386.40,
     status: 'ready',
     createdAt: '12:30 PM',
-    paymentMode: 'upi_online',
-    paymentStatus: 'paid',
+    paymentMode: 'pay_at_window',
     distanceKm: 0.4,
-    transactionId: 'UPI-9821827',
   },
   {
     id: 'ord-102',
@@ -78,10 +71,8 @@ const INITIAL_DEMO_ORDERS: Order[] = [
     total: 449.40,
     status: 'brewing',
     createdAt: '12:35 PM',
-    paymentMode: 'upi_online',
-    paymentStatus: 'paid',
+    paymentMode: 'pay_at_window',
     distanceKm: 0.8,
-    transactionId: 'UPI-4491028',
   },
   {
     id: 'ord-103',
@@ -100,7 +91,6 @@ const INITIAL_DEMO_ORDERS: Order[] = [
     status: 'incoming',
     createdAt: 'Just now',
     paymentMode: 'pay_at_window',
-    paymentStatus: 'pending',
     distanceKm: 1.2,
   },
 ];
@@ -176,12 +166,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
   const createOrder = (
     vehicleData: { carType?: string; carPlate?: string },
     cartItems?: { id: string; name: string; price: number; quantity: number; image: string }[],
-    pricing?: { subtotal: number; tax: number; total: number },
-    paymentInfo?: {
-      paymentMode: 'pay_at_window' | 'upi_online';
-      paymentStatus: 'pending' | 'paid';
-      transactionId?: string;
-    }
+    pricing?: { subtotal: number; tax: number; total: number }
   ): Order | null => {
     if (!currentUser) return null;
 
@@ -199,10 +184,6 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     const tax = pricing?.tax ?? Number((subtotal * 0.05).toFixed(2));
     const total = pricing?.total ?? Number((subtotal + tax).toFixed(2));
 
-    const paymentMode = paymentInfo?.paymentMode || (total > 350 ? 'upi_online' : 'pay_at_window');
-    const paymentStatus = paymentInfo?.paymentStatus || (paymentMode === 'upi_online' ? 'paid' : 'pending');
-    const transactionId = paymentInfo?.transactionId || (paymentMode === 'upi_online' ? `UPI-${Math.floor(1000000 + Math.random() * 9000000)}` : undefined);
-
     const newOrder: Order = {
       id: `ord-${Date.now()}`,
       token,
@@ -217,10 +198,8 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       total,
       status: 'incoming',
       createdAt: 'Just now',
-      paymentMode,
-      paymentStatus,
+      paymentMode: 'pay_at_window',
       distanceKm: userDistanceKm,
-      transactionId,
     };
 
     setOrders(prev => [newOrder, ...prev]);
@@ -266,10 +245,8 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
       total: 470.40,
       status: 'incoming',
       createdAt: 'Just now',
-      paymentMode: 'upi_online',
-      paymentStatus: 'paid',
+      paymentMode: 'pay_at_window',
       distanceKm: 0.9,
-      transactionId: `UPI-${Math.floor(1000000 + Math.random() * 9000000)}`,
     };
 
     setOrders(prev => [randomOrder, ...prev]);

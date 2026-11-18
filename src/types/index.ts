@@ -40,10 +40,8 @@ export interface Order {
   total: number;
   status: OrderStatus;
   createdAt: string;
-  paymentMode: 'pay_at_window' | 'upi_online';
-  paymentStatus: 'pending' | 'paid';
+  paymentMode: 'pay_at_window';
   distanceKm: number;
-  transactionId?: string;
 }
 
 export interface CustomerUser {

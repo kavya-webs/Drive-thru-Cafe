@@ -6,7 +6,7 @@
 -- 1. Enable UUID Extension
 CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- 2. Create Orders Table with Anti-Fraud Option B Fields
+-- 2. Create Orders Table with 100% Physical Pay-at-Window
 CREATE TABLE IF NOT EXISTS public.orders (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     token TEXT NOT NULL,
@@ -20,10 +20,8 @@ CREATE TABLE IF NOT EXISTS public.orders (
     tax NUMERIC(10, 2) NOT NULL,
     total NUMERIC(10, 2) NOT NULL,
     status TEXT NOT NULL DEFAULT 'incoming' CHECK (status IN ('incoming', 'brewing', 'ready', 'dispatched', 'cancelled')),
-    payment_mode TEXT NOT NULL DEFAULT 'pay_at_window' CHECK (payment_mode IN ('pay_at_window', 'upi_online')),
-    payment_status TEXT NOT NULL DEFAULT 'pending' CHECK (payment_status IN ('pending', 'paid')),
+    payment_mode TEXT NOT NULL DEFAULT 'pay_at_window',
     distance_km NUMERIC(4, 1) DEFAULT 0.6,
-    transaction_id TEXT,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
 );
