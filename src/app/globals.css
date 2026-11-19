@@ -59,16 +59,25 @@
 }
 
 /* ==========================================================================
-   Universal Anti-Squish & Responsiveness Hardening
-   Prevents any button, tab, badge, pill, or tag from squishing, collapsing,
-   or wrapping words into awkward vertical word stacks on mobile/tablet screens.
+   Universal Anti-Squish & Layout Responsiveness Protection
+   Ensures badges, pills, buttons, and tabs never wrap awkwardly or squeeze 
+   into vertical word stacks on any device or viewport width.
    ========================================================================== */
 
-/* Buttons, Tabs, & Clickable Controls: keep labels unbroken on single lines */
+/* Universal minimum content protection for all buttons, tabs, and interactive controls */
 button:not(.allow-wrap),
 [role="button"]:not(.allow-wrap),
 [role="tab"]:not(.allow-wrap) {
-  white-space: nowrap;
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  min-width: max-content !important;
+}
+
+/* Allow multiline buttons only when explicitly flagged */
+button.allow-wrap,
+[role="button"].allow-wrap {
+  white-space: normal !important;
+  min-width: 0 !important;
 }
 
 /* Status pills, indicator tags, and compact rounded badges */
@@ -79,9 +88,19 @@ span[class*="rounded-xl"],
 span[class*="rounded"],
 .badge,
 .pill,
-.chip {
+.chip,
+.tab-badge {
   white-space: nowrap !important;
   flex-shrink: 0 !important;
+  min-width: max-content !important;
   word-break: keep-all !important;
   overflow-wrap: normal !important;
+}
+
+/* Ensure pulse indicators stay circular and never stretch or squash */
+span[class*="rounded-full"]:empty,
+span[class*="animate-pulse"],
+span[class*="animate-ping"] {
+  flex-shrink: 0 !important;
+  aspect-ratio: 1 / 1 !important;
 }

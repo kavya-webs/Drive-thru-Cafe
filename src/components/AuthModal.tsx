@@ -159,27 +159,27 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               setActiveTab('customer');
               setStep('details');
             }}
-            className={`py-2 px-3 rounded-lg transition flex items-center justify-center gap-1.5 ${
+            className={`py-2 px-3 rounded-lg transition flex items-center justify-center gap-1.5 whitespace-nowrap flex-shrink-0 ${
               activeTab === 'customer'
                 ? 'bg-brand-sky text-black shadow-sm'
                 : 'text-concrete-600 dark:text-zinc-400 hover:text-black dark:hover:text-white'
             }`}
           >
-            <User className="w-3.5 h-3.5" />
-            <span>Customer Sign-In</span>
+            <User className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="whitespace-nowrap">Customer Sign-In</span>
           </button>
 
           <button
             type="button"
             onClick={() => setActiveTab('staff')}
-            className={`py-2 px-3 rounded-lg transition flex items-center justify-center gap-1.5 ${
+            className={`py-2 px-3 rounded-lg transition flex items-center justify-center gap-1.5 whitespace-nowrap flex-shrink-0 ${
               activeTab === 'staff'
                 ? 'bg-brand-sky text-black shadow-sm'
                 : 'text-concrete-600 dark:text-zinc-400 hover:text-black dark:hover:text-white'
             }`}
           >
-            <Lock className="w-3.5 h-3.5" />
-            <span>Staff / Barista</span>
+            <Lock className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="whitespace-nowrap">Staff / Barista</span>
           </button>
         </div>
 

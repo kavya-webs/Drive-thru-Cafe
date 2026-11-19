@@ -258,9 +258,9 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
             <div className="flex lg:hidden items-center gap-1.5 p-1 rounded-2xl bg-white dark:bg-noir-card border border-concrete-300 dark:border-white/10 mb-4 overflow-x-auto no-scrollbar shadow-sm">
           <button
             onClick={() => setStationFilter('all')}
-            className={`flex-1 min-w-[70px] py-2 px-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap text-center ${
+            className={`flex-1 min-w-[70px] py-2 px-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap flex-shrink-0 text-center ${
               stationFilter === 'all'
-                ? 'bg-brand-sky text-black shadow-sm'
+                ? 'bg-brand-sky text-black shadow-sm font-black'
                 : 'text-concrete-700 dark:text-zinc-400 hover:text-black dark:hover:text-white'
             }`}
           >
@@ -268,9 +268,9 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
           </button>
           <button
             onClick={() => setStationFilter('incoming')}
-            className={`flex-1 min-w-[85px] py-2 px-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap text-center ${
+            className={`flex-1 min-w-[85px] py-2 px-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap flex-shrink-0 text-center ${
               stationFilter === 'incoming'
-                ? 'bg-brand-sky text-black shadow-sm'
+                ? 'bg-brand-sky text-black shadow-sm font-black'
                 : 'text-concrete-700 dark:text-zinc-400 hover:text-black dark:hover:text-white'
             }`}
           >
@@ -278,9 +278,9 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
           </button>
           <button
             onClick={() => setStationFilter('brewing')}
-            className={`flex-1 min-w-[85px] py-2 px-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap text-center ${
+            className={`flex-1 min-w-[85px] py-2 px-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap flex-shrink-0 text-center ${
               stationFilter === 'brewing'
-                ? 'bg-amber-500 text-black shadow-sm'
+                ? 'bg-amber-500 text-black shadow-sm font-black'
                 : 'text-concrete-700 dark:text-zinc-400 hover:text-black dark:hover:text-white'
             }`}
           >
@@ -288,9 +288,9 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
           </button>
           <button
             onClick={() => setStationFilter('ready')}
-            className={`flex-1 min-w-[85px] py-2 px-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap text-center ${
+            className={`flex-1 min-w-[85px] py-2 px-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap flex-shrink-0 text-center ${
               stationFilter === 'ready'
-                ? 'bg-emerald-500 text-black shadow-sm'
+                ? 'bg-emerald-500 text-black shadow-sm font-black'
                 : 'text-concrete-700 dark:text-zinc-400 hover:text-black dark:hover:text-white'
             }`}
           >

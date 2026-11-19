@@ -165,7 +165,7 @@ export const BaristaMenuEditor: React.FC = () => {
             <h1 className="text-base sm:text-xl font-black text-concrete-900 dark:text-white leading-tight">
               Menu Manager &amp; Live Price Editor
             </h1>
-            <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-brand-sky/15 text-brand-sky border border-brand-sky/30 whitespace-nowrap flex-shrink-0 shadow-sm">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-brand-sky/15 text-brand-sky border border-brand-sky/30 whitespace-nowrap flex-shrink-0 min-w-max shadow-sm">
               <span className="w-1.5 h-1.5 rounded-full bg-brand-sky animate-pulse flex-shrink-0"></span>
               REAL-TIME SYNC
             </span>
