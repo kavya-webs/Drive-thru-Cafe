@@ -42,6 +42,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [currentTime, setCurrentTime] = useState<string>('');
   const [showBlacklistDrawer, setShowBlacklistDrawer] = useState(false);
+  const [stationFilter, setStationFilter] = useState<'all' | 'incoming' | 'brewing' | 'ready'>('all');
 
   useEffect(() => {
     const updateClock = () => {
@@ -210,14 +211,58 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
       </header>
 
       {/* MAIN KDS LANES GRID (3 WORKSTATIONS) */}
-      <main className="flex-1 max-w-[1600px] w-full mx-auto p-4 sm:p-6">
+      <main className="flex-1 max-w-[1600px] w-full mx-auto p-3 sm:p-6">
         
+        {/* Tablet & Mobile Station Switcher (iPad Portrait & Phone Optimization) */}
+        <div className="flex lg:hidden items-center gap-1.5 p-1 rounded-2xl bg-white dark:bg-noir-card border border-concrete-300 dark:border-white/10 mb-4 overflow-x-auto no-scrollbar shadow-sm">
+          <button
+            onClick={() => setStationFilter('all')}
+            className={`flex-1 min-w-[70px] py-2 px-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap text-center ${
+              stationFilter === 'all'
+                ? 'bg-brand-sky text-black shadow-sm'
+                : 'text-concrete-700 dark:text-zinc-400 hover:text-black dark:hover:text-white'
+            }`}
+          >
+            All Stations ({orders.length})
+          </button>
+          <button
+            onClick={() => setStationFilter('incoming')}
+            className={`flex-1 min-w-[85px] py-2 px-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap text-center ${
+              stationFilter === 'incoming'
+                ? 'bg-brand-sky text-black shadow-sm'
+                : 'text-concrete-700 dark:text-zinc-400 hover:text-black dark:hover:text-white'
+            }`}
+          >
+            Incoming ({incomingOrders.length})
+          </button>
+          <button
+            onClick={() => setStationFilter('brewing')}
+            className={`flex-1 min-w-[85px] py-2 px-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap text-center ${
+              stationFilter === 'brewing'
+                ? 'bg-amber-500 text-black shadow-sm'
+                : 'text-concrete-700 dark:text-zinc-400 hover:text-black dark:hover:text-white'
+            }`}
+          >
+            Brewing ({brewingOrders.length})
+          </button>
+          <button
+            onClick={() => setStationFilter('ready')}
+            className={`flex-1 min-w-[85px] py-2 px-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap text-center ${
+              stationFilter === 'ready'
+                ? 'bg-emerald-500 text-black shadow-sm'
+                : 'text-concrete-700 dark:text-zinc-400 hover:text-black dark:hover:text-white'
+            }`}
+          >
+            Ready ({readyOrders.length})
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
           {/* ========================================= */}
           {/* LANE 1: INCOMING DRIVE-THRU TICKETS */}
           {/* ========================================= */}
-          <div className="flex flex-col rounded-3xl border border-concrete-300 dark:border-white/10 bg-white/60 dark:bg-noir-card/60 p-4 shadow-sm backdrop-blur-sm">
+          <div className={`${stationFilter !== 'all' && stationFilter !== 'incoming' ? 'hidden lg:flex' : 'flex'} flex-col rounded-3xl border border-concrete-300 dark:border-white/10 bg-white/60 dark:bg-noir-card/60 p-4 shadow-sm backdrop-blur-sm`}>
             <div className="flex items-center justify-between pb-3 border-b border-concrete-200 dark:border-white/10 mb-4 px-1">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-brand-sky animate-ping"></span>
@@ -345,7 +390,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
           {/* ========================================= */}
           {/* LANE 2: IN PREPARATION / BREWING */}
           {/* ========================================= */}
-          <div className="flex flex-col rounded-3xl border border-concrete-300 dark:border-white/10 bg-white/60 dark:bg-noir-card/60 p-4 shadow-sm backdrop-blur-sm">
+          <div className={`${stationFilter !== 'all' && stationFilter !== 'brewing' ? 'hidden lg:flex' : 'flex'} flex-col rounded-3xl border border-concrete-300 dark:border-white/10 bg-white/60 dark:bg-noir-card/60 p-4 shadow-sm backdrop-blur-sm`}>
             <div className="flex items-center justify-between pb-3 border-b border-concrete-200 dark:border-white/10 mb-4 px-1">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse"></span>
@@ -458,7 +503,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
           {/* ========================================= */}
           {/* LANE 3: READY AT DRIVE-THRU WINDOW */}
           {/* ========================================= */}
-          <div className="flex flex-col rounded-3xl border border-concrete-300 dark:border-white/10 bg-white/60 dark:bg-noir-card/60 p-4 shadow-sm backdrop-blur-sm">
+          <div className={`${stationFilter !== 'all' && stationFilter !== 'ready' ? 'hidden lg:flex' : 'flex'} flex-col rounded-3xl border border-concrete-300 dark:border-white/10 bg-white/60 dark:bg-noir-card/60 p-4 shadow-sm backdrop-blur-sm`}>
             <div className="flex items-center justify-between pb-3 border-b border-concrete-200 dark:border-white/10 mb-4 px-1">
               <div className="flex items-center gap-2">
                 <span className="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>

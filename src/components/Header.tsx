@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { useTheme } from '@/context/ThemeContext';
 import { useCart } from '@/context/CartContext';
 import { useOrders } from '@/context/OrderContext';
-import { ShoppingBag, Sun, Moon, User, LogOut } from 'lucide-react';
+import { ShoppingBag, Sun, Moon, User, LogOut, Phone } from 'lucide-react';
 
 interface HeaderProps {
   currentView: 'menu' | 'track';
@@ -25,34 +25,34 @@ export const Header: React.FC<HeaderProps> = ({
 
   return (
     <header className="sticky top-0 z-40 backdrop-blur-md border-b transition-colors bg-white/95 dark:bg-noir-base/95 border-concrete-300 dark:border-white/10 shadow-sm">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-18 py-3 flex items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 h-16 sm:h-18 py-2.5 flex items-center justify-between gap-2 sm:gap-4">
         
         {/* Brand Logo & Tagline */}
         <div 
-          className="flex items-center gap-3 cursor-pointer select-none" 
+          className="flex items-center gap-2 sm:gap-3 cursor-pointer select-none flex-shrink-0" 
           onClick={() => onNavigate('menu')}
           title="Grey Dot. Coffee Shop Surat"
         >
-          <div className="relative h-9 w-32 sm:w-36">
+          <div className="relative h-7 w-24 sm:h-8 sm:w-32">
             <Image
               src="/grey_dot_logo_straight.png"
-              alt="grey dot."
+              alt="Grey Dot. Coffee Shop"
               fill
               className="object-contain"
               priority
             />
           </div>
-          <span className="hidden md:inline-flex items-center gap-1.5 text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-sky-500/10 text-brand-sky border border-brand-sky/20">
+          <span className="hidden lg:inline-flex items-center gap-1.5 text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/10 text-brand-sky border border-brand-sky/20">
             <span className="w-1.5 h-1.5 rounded-full bg-brand-sky animate-pulse"></span>
-            DRIVE-THRU & TO-GO
+            DRIVE-THRU &amp; TO-GO
           </span>
         </div>
 
-        {/* Customer Navigation Tabs (Only Menu & Live Token) */}
-        <nav className="flex items-center gap-1 p-1 rounded-xl text-xs font-semibold bg-concrete-100 dark:bg-white/5 border border-concrete-200 dark:border-white/10">
+        {/* Customer Navigation Tabs (Menu & Live Token) */}
+        <nav className="flex items-center gap-1 p-0.5 sm:p-1 rounded-xl text-xs font-semibold bg-concrete-100 dark:bg-white/5 border border-concrete-200 dark:border-white/10">
           <button
             onClick={() => onNavigate('menu')}
-            className={`px-4 py-2 rounded-lg transition whitespace-nowrap flex items-center gap-1.5 ${
+            className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg transition whitespace-nowrap flex items-center gap-1 sm:gap-1.5 text-xs ${
               currentView === 'menu'
                 ? 'bg-brand-sky text-black font-bold shadow-sm'
                 : 'text-concrete-700 dark:text-zinc-400 hover:text-black dark:hover:text-white'
@@ -64,32 +64,44 @@ export const Header: React.FC<HeaderProps> = ({
 
           <button
             onClick={() => onNavigate('track')}
-            className={`px-4 py-2 rounded-lg transition whitespace-nowrap flex items-center gap-1.5 relative ${
+            className={`px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-lg transition whitespace-nowrap flex items-center gap-1 sm:gap-1.5 relative text-xs ${
               currentView === 'track'
                 ? 'bg-brand-sky text-black font-bold shadow-sm'
                 : 'text-concrete-700 dark:text-zinc-400 hover:text-black dark:hover:text-white'
             }`}
           >
             <span>📍</span>
-            <span>Live Token</span>
+            <span className="hidden xs:inline">Live </span>
+            <span>Token</span>
             {activeOrder && (
               <span className="w-2 h-2 rounded-full bg-brand-sky animate-ping absolute -top-0.5 -right-0.5"></span>
             )}
           </button>
         </nav>
 
-        {/* Right Controls: Sign In / Customer Profile, Theme & Cart */}
-        <div className="flex items-center gap-2">
+        {/* Right Controls: Customer Care Hotline, Sign In / Profile, Theme & Cart */}
+        <div className="flex items-center gap-1.5 sm:gap-2">
           
+          {/* Direct Customer Care Quick Link */}
+          <a
+            href="tel:+919727042420"
+            className="hidden md:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl border border-concrete-300 dark:border-white/10 text-xs font-bold text-concrete-700 dark:text-zinc-300 hover:border-brand-sky hover:text-brand-sky transition bg-white dark:bg-noir-card"
+            title="Call Customer Care (+91 97270 42420)"
+          >
+            <Phone className="w-3.5 h-3.5 text-brand-sky" />
+            <span className="hidden xl:inline">+91 97270 42420</span>
+            <span className="xl:hidden">Care</span>
+          </a>
+
           {/* Customer Profile or Sign In Button */}
           {currentUser ? (
             <div className="relative">
               <button
                 onClick={() => setShowUserMenu(!showUserMenu)}
-                className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-concrete-300 dark:border-white/10 text-xs bg-white dark:bg-noir-card hover:border-brand-sky transition"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-concrete-300 dark:border-white/10 text-xs bg-white dark:bg-noir-card hover:border-brand-sky transition"
               >
                 <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
-                <span className="font-semibold text-concrete-900 dark:text-zinc-200 max-w-[100px] truncate">
+                <span className="font-semibold text-concrete-900 dark:text-zinc-200 max-w-[80px] sm:max-w-[110px] truncate">
                   {currentUser.name}
                 </span>
               </button>
@@ -117,40 +129,36 @@ export const Header: React.FC<HeaderProps> = ({
           ) : (
             <button
               onClick={onOpenAuth}
-              className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl border border-concrete-300 dark:border-white/10 text-xs font-bold text-concrete-800 dark:text-zinc-200 hover:border-brand-sky hover:text-brand-sky transition bg-white dark:bg-noir-card shadow-sm"
+              className="flex items-center gap-1 px-2 sm:px-3 py-1.5 rounded-xl border border-concrete-300 dark:border-white/10 text-xs font-bold text-concrete-800 dark:text-zinc-200 hover:border-brand-sky hover:text-brand-sky transition bg-white dark:bg-noir-card shadow-sm"
               title="Sign in as Customer or Barista"
             >
               <User className="w-3.5 h-3.5 text-brand-sky" />
-              <span>Sign In</span>
+              <span className="hidden sm:inline">Sign In</span>
             </button>
           )}
 
-          {/* Theme Toggle Button (Light Mode / Dark Mode) */}
+          {/* Theme Toggle Button */}
           <button
             onClick={toggleTheme}
-            className="p-2.5 rounded-xl border border-concrete-300 dark:border-white/10 bg-white dark:bg-noir-card text-concrete-800 dark:text-zinc-200 hover:border-brand-sky transition-all flex items-center justify-center text-xs font-bold shadow-sm"
-            title={theme === 'dark' ? 'Switch to Light Mode (Concrete Grey)' : 'Switch to Dark Mode (Noir Urban)'}
+            className="p-2 sm:p-2.5 rounded-xl border border-concrete-300 dark:border-white/10 bg-white dark:bg-noir-card text-concrete-800 dark:text-zinc-200 hover:border-brand-sky transition-all flex items-center justify-center text-xs font-bold shadow-sm"
+            title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+            aria-label="Toggle Theme"
           >
             {theme === 'dark' ? (
-              <span className="flex items-center gap-1.5">
-                <Sun className="w-4 h-4 text-amber-400" />
-                <span className="hidden sm:inline">Light</span>
-              </span>
+              <Sun className="w-4 h-4 text-amber-400" />
             ) : (
-              <span className="flex items-center gap-1.5">
-                <Moon className="w-4 h-4 text-sky-600" />
-                <span className="hidden sm:inline">Dark</span>
-              </span>
+              <Moon className="w-4 h-4 text-sky-600" />
             )}
           </button>
 
           {/* Cart Trigger Button */}
           <button
             onClick={toggleDrawer}
-            className="relative p-2.5 rounded-xl border border-concrete-300 dark:border-white/10 bg-white dark:bg-noir-card text-concrete-900 dark:text-white hover:border-brand-sky transition flex items-center justify-center shadow-sm"
+            className="relative p-2 sm:p-2.5 rounded-xl border border-concrete-300 dark:border-white/10 bg-white dark:bg-noir-card text-concrete-900 dark:text-white hover:border-brand-sky transition flex items-center justify-center shadow-sm"
             title="View Drive-Thru Cart"
+            aria-label="View Cart"
           >
-            <ShoppingBag className="w-5 h-5 text-concrete-900 dark:text-zinc-100" />
+            <ShoppingBag className="w-4 h-4 sm:w-5 sm:h-5 text-concrete-900 dark:text-zinc-100" />
             {itemCount > 0 && (
               <span className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-brand-sky text-black text-[11px] font-black rounded-full flex items-center justify-center shadow-md animate-in zoom-in">
                 {itemCount}

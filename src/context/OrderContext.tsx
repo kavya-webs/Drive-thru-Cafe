@@ -29,6 +29,7 @@ interface OrderContextType {
   isPhoneBlacklisted: (phone: string) => boolean;
   markNoShow: (orderId: string) => void;
   clearAllOrders: () => void;
+  clearActiveOrder: () => void;
   createOrder: (
     vehicleData: { carType?: string; carPlate?: string },
     cartItems?: { id: string; name: string; price: number; quantity: number; image: string }[],
@@ -220,6 +221,14 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
     clearAllOrdersFromFirestore();
   };
 
+  const clearActiveOrder = () => {
+    setActiveOrder(null);
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('greydot-active-order');
+    }
+    broadcastActiveOrder(null);
+  };
+
   const loginAdmin = (email: string, pass: string) => {
     if (email.trim().toLowerCase() === 'admin@gmail.com' && pass.trim() === 'admin') {
       setIsAdminLoggedIn(true);
@@ -396,6 +405,7 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
         isPhoneBlacklisted,
         markNoShow,
         clearAllOrders,
+        clearActiveOrder,
         createOrder,
         updateOrderStatus,
         simulateIncomingOrder,

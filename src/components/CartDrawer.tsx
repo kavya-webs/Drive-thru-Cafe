@@ -246,19 +246,19 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onTriggerAuth }) => {
             <div>
               <input
                 type="text"
-                placeholder="Car Type (e.g. Creta / Thar)"
+                placeholder="Car Type (e.g. Creta)"
                 value={carType}
                 onChange={e => setCarType(e.target.value)}
-                className="w-full bg-white dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-concrete-900 dark:text-white placeholder-concrete-400 dark:placeholder-zinc-500 focus:outline-none focus:border-brand-sky transition"
+                className="w-full bg-white dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-3 py-2 text-base sm:text-xs text-concrete-900 dark:text-white placeholder-concrete-400 dark:placeholder-zinc-500 focus:outline-none focus:border-brand-sky transition"
               />
             </div>
             <div>
               <input
                 type="text"
-                placeholder="Plate No. (e.g. GJ-05-AB-1234)"
+                placeholder="Plate (e.g. GJ-05)"
                 value={carPlate}
                 onChange={e => setCarPlate(e.target.value)}
-                className="w-full bg-white dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-3 py-2 text-xs text-concrete-900 dark:text-white placeholder-concrete-400 dark:placeholder-zinc-500 focus:outline-none focus:border-brand-sky transition uppercase"
+                className="w-full bg-white dark:bg-noir-card border border-concrete-300 dark:border-white/10 rounded-xl px-3 py-2 text-base sm:text-xs text-concrete-900 dark:text-white placeholder-concrete-400 dark:placeholder-zinc-500 focus:outline-none focus:border-brand-sky transition uppercase"
               />
             </div>
           </div>
@@ -316,6 +316,15 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ onTriggerAuth }) => {
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
             <span>Orders accepted within 3 km only · Physical payment at counter</span>
           </p>
+          <div className="text-center mt-2 pt-2 border-t border-concrete-100 dark:border-white/5">
+            <a
+              href="tel:+919727042420"
+              className="text-[11px] font-semibold text-concrete-600 dark:text-zinc-400 hover:text-brand-sky inline-flex items-center gap-1 transition"
+            >
+              <span>Need help? Call counter:</span>
+              <span className="text-brand-sky font-bold">+91 97270 42420</span>
+            </a>
+          </div>
         </div>
 
       </aside>

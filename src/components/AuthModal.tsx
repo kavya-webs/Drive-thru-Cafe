@@ -124,8 +124,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in duration-200">
-      <div className="max-w-md w-full rounded-3xl border p-7 sm:p-9 relative bg-white dark:bg-noir-surface border-concrete-300 dark:border-white/10 shadow-2xl">
+    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-3 sm:p-4 animate-in fade-in duration-200">
+      <div className="max-w-md w-full max-h-[92vh] overflow-y-auto rounded-3xl border p-5 sm:p-8 relative bg-white dark:bg-noir-surface border-concrete-300 dark:border-white/10 shadow-2xl">
         
         {/* Close Button */}
         <button
@@ -426,6 +426,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             </div>
           </form>
         )}
+
+        {/* Customer Care Contact Helper */}
+        <div className="mt-5 pt-4 border-t border-concrete-200 dark:border-white/10 text-center">
+          <p className="text-[11px] text-concrete-500 dark:text-zinc-400">
+            Need counter assistance? Call <a href="tel:+919727042420" className="text-brand-sky font-bold hover:underline">+91 97270 42420</a> or email <a href="mailto:care@greydotcoffee.com" className="text-brand-sky font-bold hover:underline">care@greydotcoffee.com</a>
+          </p>
+        </div>
 
       </div>
     </div>

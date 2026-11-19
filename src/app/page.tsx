@@ -8,6 +8,7 @@ import { AuthModal } from '@/components/AuthModal';
 import { SuccessOverlay } from '@/components/SuccessOverlay';
 import { LiveTokenView } from '@/components/LiveTokenView';
 import { BaristaKDS } from '@/components/BaristaKDS';
+import { Footer } from '@/components/Footer';
 import { useOrders } from '@/context/OrderContext';
 
 export default function HomePage() {
@@ -63,6 +64,9 @@ export default function HomePage() {
 
       {/* Confetti & Transmitted to Counter Success Overlay */}
       <SuccessOverlay onGoToTrack={() => setCurrentView('track')} />
+
+      {/* Customer Care, Drive-thru Guide & Location Footer */}
+      <Footer />
 
     </div>
   );
