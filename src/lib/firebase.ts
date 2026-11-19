@@ -1,4 +1,4 @@
-import { Order, OrderStatus } from '@/types';
+import { Order, OrderStatus, MenuItem } from '@/types';
 
 const FIRESTORE_BASE_URL = 'https://firestore.googleapis.com/v1/projects/greydot-cafe-surat/databases/(default)/documents';
 
@@ -151,4 +151,70 @@ export async function clearAllOrdersFromFirestore(): Promise<void> {
   } catch (error) {
     console.error('Error clearing orders from Firestore REST:', error);
   }
+}
+
+// Fetch menu items from Cloud Firestore via REST
+export async function fetchMenuFromFirestore(): Promise<MenuItem[] | null> {
+  try {
+    const res = await fetch(`${FIRESTORE_BASE_URL}/settings/menu`, {
+      method: 'GET',
+      headers: { 'Accept': 'application/json' },
+      cache: 'no-store'
+    });
+    if (!res.ok) {
+      if (res.status === 404) return null;
+      return null;
+    }
+    const data = await res.json();
+    const itemsJson = data.fields?.itemsJson?.stringValue;
+    if (itemsJson) {
+      return JSON.parse(itemsJson) as MenuItem[];
+    }
+    return null;
+  } catch (err) {
+    console.error('Error fetching menu from Firestore REST:', err);
+    return null;
+  }
+}
+
+// Save menu items to Cloud Firestore via REST
+export async function saveMenuToFirestore(items: MenuItem[]): Promise<void> {
+  try {
+    const body = {
+      fields: {
+        itemsJson: { stringValue: JSON.stringify(items) },
+        updatedAt: { stringValue: new Date().toISOString() },
+        timestamp: { integerValue: String(Date.now()) }
+      }
+    };
+
+    await fetch(`${FIRESTORE_BASE_URL}/settings/menu`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+  } catch (error) {
+    console.error('Error saving menu to Firestore REST:', error);
+  }
+}
+
+// Subscribe to real-time menu updates
+export function subscribeToMenu(onMenuUpdated: (items: MenuItem[]) => void): () => void {
+  let isMounted = true;
+
+  const poll = async () => {
+    if (!isMounted) return;
+    const items = await fetchMenuFromFirestore();
+    if (isMounted && items && Array.isArray(items)) {
+      onMenuUpdated(items);
+    }
+  };
+
+  poll();
+  const intervalId = setInterval(poll, 3000);
+
+  return () => {
+    isMounted = false;
+    clearInterval(intervalId);
+  };
 }

@@ -2,9 +2,9 @@
 
 import React, { useState } from 'react';
 import Image from 'next/image';
-import { MENU_ITEMS } from '@/lib/menuData';
 import { CategoryId } from '@/types';
 import { useCart } from '@/context/CartContext';
+import { useMenu } from '@/context/MenuContext';
 import { 
   Coffee, 
   MapPin, 
@@ -22,6 +22,7 @@ export const MenuSection: React.FC = () => {
   const [selectedCategory, setSelectedCategory] = useState<CategoryId>('all');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const { addToCart } = useCart();
+  const { menuItems } = useMenu();
 
   const categories: { id: CategoryId; label: string }[] = [
     { id: 'all', label: '⚡ All Items' },
@@ -34,8 +35,8 @@ export const MenuSection: React.FC = () => {
   ];
 
   const filteredItems = selectedCategory === 'all'
-    ? MENU_ITEMS
-    : MENU_ITEMS.filter(item => item.category === selectedCategory);
+    ? menuItems
+    : menuItems.filter(item => item.category === selectedCategory);
 
   const faqs = [
     {

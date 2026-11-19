@@ -4,6 +4,8 @@ import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import { useOrders } from '@/context/OrderContext';
 import { useTheme } from '@/context/ThemeContext';
+import { useMenu } from '@/context/MenuContext';
+import { BaristaMenuEditor } from '@/components/BaristaMenuEditor';
 import { 
   Clock, 
   CheckCircle, 
@@ -37,11 +39,13 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
     blacklistedPhones 
   } = useOrders();
   const { theme, toggleTheme } = useTheme();
+  const { menuItems } = useMenu();
 
   const [soundEnabled, setSoundEnabled] = useState(true);
   const [currentTime, setCurrentTime] = useState<string>('');
   const [showBlacklistDrawer, setShowBlacklistDrawer] = useState(false);
   const [stationFilter, setStationFilter] = useState<'all' | 'incoming' | 'brewing' | 'ready'>('all');
+  const [baristaTab, setBaristaTab] = useState<'orders' | 'menu'>('orders');
 
   useEffect(() => {
     const updateClock = () => {
@@ -200,11 +204,58 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
         </div>
       </header>
 
-      {/* MAIN KDS LANES GRID (3 WORKSTATIONS) */}
+      {/* BARISTA SUB-HEADER: TAB SWITCHER (LIVE ORDERS vs EDIT MENU) */}
+      <div className="bg-white/90 dark:bg-noir-surface/90 backdrop-blur-md border-b border-concrete-300 dark:border-white/10 px-3 sm:px-6 py-2">
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-concrete-100 dark:bg-white/5 border border-concrete-200 dark:border-white/10">
+            <button
+              onClick={() => setBaristaTab('orders')}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 sm:gap-2 ${
+                baristaTab === 'orders'
+                  ? 'bg-brand-sky text-black shadow-sm font-black'
+                  : 'text-concrete-700 dark:text-zinc-400 hover:text-black dark:hover:text-white'
+              }`}
+              id="barista-tab-orders"
+            >
+              <span>🚗</span>
+              <span>Live KDS Orders</span>
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-black/10 dark:bg-white/10 font-mono font-bold">
+                {orders.length}
+              </span>
+            </button>
+
+            <button
+              onClick={() => setBaristaTab('menu')}
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 sm:gap-2 ${
+                baristaTab === 'menu'
+                  ? 'bg-brand-sky text-black shadow-sm font-black'
+                  : 'text-concrete-700 dark:text-zinc-400 hover:text-black dark:hover:text-white'
+              }`}
+              id="barista-tab-menu"
+            >
+              <span>📋</span>
+              <span>Edit Menu</span>
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-black/10 dark:bg-white/10 font-mono font-bold">
+                {menuItems.length}
+              </span>
+            </button>
+          </div>
+
+          <div className="hidden sm:flex items-center gap-2 text-xs font-semibold text-concrete-500 dark:text-zinc-400">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span>Real-Time Cloud Sync Active</span>
+          </div>
+        </div>
+      </div>
+
+      {/* MAIN KDS CONTENT: ORDERS LANES OR MENU MANAGER */}
       <main className="flex-1 max-w-[1600px] w-full mx-auto p-3 sm:p-6">
-        
-        {/* Tablet & Mobile Station Switcher (iPad Portrait & Phone Optimization) */}
-        <div className="flex lg:hidden items-center gap-1.5 p-1 rounded-2xl bg-white dark:bg-noir-card border border-concrete-300 dark:border-white/10 mb-4 overflow-x-auto no-scrollbar shadow-sm">
+        {baristaTab === 'menu' ? (
+          <BaristaMenuEditor />
+        ) : (
+          <>
+            {/* Tablet & Mobile Station Switcher (iPad Portrait & Phone Optimization) */}
+            <div className="flex lg:hidden items-center gap-1.5 p-1 rounded-2xl bg-white dark:bg-noir-card border border-concrete-300 dark:border-white/10 mb-4 overflow-x-auto no-scrollbar shadow-sm">
           <button
             onClick={() => setStationFilter('all')}
             className={`flex-1 min-w-[70px] py-2 px-2.5 rounded-xl text-xs font-bold transition whitespace-nowrap text-center ${
@@ -618,6 +669,9 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
           </div>
 
         </div>
+
+          </>
+        )}
 
       </main>
 

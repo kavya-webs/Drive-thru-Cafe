@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { MenuProvider } from '@/context/MenuContext';
 import { CartProvider } from '@/context/CartContext';
 import { OrderProvider } from '@/context/OrderContext';
 
@@ -195,11 +196,13 @@ export default function RootLayout({
       </head>
       <body className="antialiased min-h-screen bg-concrete-100 dark:bg-noir-base text-concrete-900 dark:text-zinc-100 transition-colors selection:bg-brand-sky selection:text-black">
         <ThemeProvider>
-          <CartProvider>
-            <OrderProvider>
-              {children}
-            </OrderProvider>
-          </CartProvider>
+          <MenuProvider>
+            <CartProvider>
+              <OrderProvider>
+                {children}
+              </OrderProvider>
+            </CartProvider>
+          </MenuProvider>
         </ThemeProvider>
       </body>
     </html>
