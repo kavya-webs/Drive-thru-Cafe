@@ -9,6 +9,7 @@ import { SuccessOverlay } from '@/components/SuccessOverlay';
 import { LiveTokenView } from '@/components/LiveTokenView';
 import { BaristaKDS } from '@/components/BaristaKDS';
 import { Footer } from '@/components/Footer';
+import { BottomNav } from '@/components/BottomNav';
 import { useOrders } from '@/context/OrderContext';
 
 export default function HomePage() {
@@ -29,13 +30,12 @@ export default function HomePage() {
   // PUBLIC / CUSTOMER VIEW (Menu browsing without login, auth on order place)
   // =========================================================================
   return (
-    <div className="min-h-screen flex flex-col bg-concrete-100 dark:bg-noir-base text-concrete-900 dark:text-zinc-100 transition-colors">
+    <div className="min-h-screen flex flex-col bg-concrete-100 dark:bg-noir-base text-concrete-900 dark:text-zinc-100 transition-colors pb-16 sm:pb-20">
       
-      {/* Customer Header Navigation (Only Menu & Live Token + Sign In trigger) */}
+      {/* Spacious Top Header: Logo on left, User Utilities & Cart on right */}
       <Header
-        currentView={currentView}
-        onNavigate={view => setCurrentView(view)}
         onOpenAuth={() => setIsAuthOpen(true)}
+        onNavigateHome={() => setCurrentView('menu')}
       />
 
       {/* Customer Main Screen Views */}
@@ -67,6 +67,12 @@ export default function HomePage() {
 
       {/* Customer Care, Drive-thru Guide & Location Footer */}
       <Footer />
+
+      {/* Dedicated Bottom Navigation Bar: Menu & Live Token Tabs */}
+      <BottomNav
+        currentView={currentView}
+        onNavigate={view => setCurrentView(view)}
+      />
 
     </div>
   );
