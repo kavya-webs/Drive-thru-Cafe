@@ -105,8 +105,8 @@ export const MenuSection: React.FC = () => {
         </div>
       </div>
 
-      {/* Category Filter Pills (Touch-scrollable on mobile) */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-3 mb-6 no-scrollbar text-sm">
+      {/* Category Filter Pills (Touch-scrollable on mobile, wraps on tablet/desktop to eliminate horizontal scrollbar) */}
+      <div className="flex items-center gap-2 overflow-x-auto sm:flex-wrap pb-2 mb-6 no-scrollbar text-sm -mx-1 px-1 sm:mx-0 sm:px-0">
         {categories.map(cat => (
           <button
             key={cat.id}

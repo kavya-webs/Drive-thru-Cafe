@@ -32,7 +32,6 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
     orders, 
     updateOrderStatus, 
     logoutAdmin, 
-    simulateIncomingOrder, 
     markNoShow,
     clearAllOrders,
     blacklistedPhones 
@@ -125,11 +124,11 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
             </span>
           </div>
 
-          {/* Right: Sound, Clock, Theme, Blacklist Drawer, Simulate, Exit */}
-          <div className="flex items-center gap-2.5">
+          {/* Right: Sound, Clock, Theme, Blacklist Drawer, Reset, Exit */}
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             
             {/* Live Clock */}
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-concrete-200 dark:border-white/10 bg-concrete-50 dark:bg-white/5 font-mono text-xs font-bold text-concrete-700 dark:text-zinc-300">
+            <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border border-concrete-200 dark:border-white/10 bg-concrete-50 dark:bg-white/5 font-mono text-xs font-bold text-concrete-700 dark:text-zinc-300">
               <Clock className="w-3.5 h-3.5 text-brand-sky" />
               <span>{currentTime || '12:00:00 PM'}</span>
             </div>
@@ -137,11 +136,12 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
             {/* Blacklist Count Pill */}
             <button
               onClick={() => setShowBlacklistDrawer(!showBlacklistDrawer)}
-              className="px-2.5 py-1.5 rounded-xl border border-red-500/20 bg-red-500/10 text-red-500 text-xs font-bold hover:bg-red-500/20 transition flex items-center gap-1"
+              className="px-2 sm:px-2.5 py-1.5 rounded-xl border border-red-500/20 bg-red-500/10 text-red-500 text-xs font-bold hover:bg-red-500/20 transition flex items-center gap-1"
               title="View No-Show Flagged Numbers"
             >
               <UserX className="w-3.5 h-3.5" />
-              <span>Flagged: {blacklistedPhones.length}</span>
+              <span className="hidden sm:inline">Flagged: </span>
+              <span>{blacklistedPhones.length}</span>
             </button>
 
             {/* Sound Toggle */}
@@ -150,7 +150,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
                 setSoundEnabled(!soundEnabled);
                 if (!soundEnabled) playChimeSound();
               }}
-              className="p-2 rounded-xl border border-concrete-300 dark:border-white/10 bg-white dark:bg-noir-card text-concrete-700 dark:text-zinc-300 hover:border-brand-sky transition"
+              className="p-1.5 sm:p-2 rounded-xl border border-concrete-300 dark:border-white/10 bg-white dark:bg-noir-card text-concrete-700 dark:text-zinc-300 hover:border-brand-sky transition"
               title={soundEnabled ? 'Mute Alert Chimes' : 'Unmute Alert Chimes'}
             >
               {soundEnabled ? (
@@ -163,7 +163,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
             {/* Theme Toggle */}
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-xl border border-concrete-300 dark:border-white/10 bg-white dark:bg-noir-card text-concrete-700 dark:text-zinc-300 hover:border-brand-sky transition"
+              className="p-1.5 sm:p-2 rounded-xl border border-concrete-300 dark:border-white/10 bg-white dark:bg-noir-card text-concrete-700 dark:text-zinc-300 hover:border-brand-sky transition"
               title="Toggle Theme"
             >
               {theme === 'dark' ? (
@@ -173,36 +173,26 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
               )}
             </button>
 
-            {/* Simulate Incoming Order */}
-            <button
-              onClick={simulateIncomingOrder}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold bg-brand-sky hover:bg-brand-skyDark text-black shadow-sm transition flex items-center gap-1.5"
-              title="Simulate a car pulling up and placing order"
-            >
-              <PlusCircle className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">+ Simulate Car</span>
-            </button>
-
             {/* Reset Queue Button */}
             {orders.length > 0 && (
               <button
                 onClick={clearAllOrders}
-                className="px-2.5 py-1.5 rounded-xl border border-concrete-300 dark:border-white/10 hover:border-red-400 text-concrete-600 dark:text-zinc-400 hover:text-red-400 text-xs font-bold transition flex items-center gap-1"
+                className="p-1.5 sm:px-2.5 sm:py-1.5 rounded-xl border border-concrete-300 dark:border-white/10 hover:border-red-400 text-concrete-600 dark:text-zinc-400 hover:text-red-400 text-xs font-bold transition flex items-center gap-1"
                 title="Clear all orders queue"
               >
                 <Trash2 className="w-3.5 h-3.5" />
-                <span className="hidden md:inline">Reset Queue</span>
+                <span className="hidden md:inline">Reset</span>
               </button>
             )}
 
-            {/* Prominent Exit / Sign Out Button */}
+            {/* Exit / Sign Out Button */}
             <button
               onClick={handleExit}
-              className="px-3 py-1.5 rounded-xl text-xs font-bold border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/20 transition flex items-center gap-1.5"
+              className="px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-bold border border-red-500/30 bg-red-500/10 text-red-500 hover:bg-red-500/20 transition flex items-center gap-1.5"
               title="Sign out from Barista Terminal and return to customer menu"
             >
               <LogOut className="w-3.5 h-3.5" />
-              <span>Exit Terminal</span>
+              <span className="hidden sm:inline">Exit</span>
             </button>
 
           </div>
@@ -280,7 +270,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
                 <div className="py-20 text-center text-concrete-400 dark:text-zinc-500 rounded-2xl border border-dashed border-concrete-200 dark:border-white/10">
                   <span className="text-3xl block mb-2">🚗</span>
                   <p className="text-xs font-bold">No incoming orders</p>
-                  <p className="text-[11px] mt-1">Click "+ Simulate Car" to test drive-thru queue</p>
+                  <p className="text-[11px] mt-1">Live customer drive-thru orders will appear here</p>
                 </div>
               ) : (
                 incomingOrders.map(ord => (
