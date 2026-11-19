@@ -79,7 +79,7 @@ export const MenuSection: React.FC = () => {
               <h1 className="text-sm sm:text-base font-bold text-concrete-900 dark:text-white">
                 Grey Dot. Coffee Shop Surat
               </h1>
-              <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
+              <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 whitespace-nowrap flex-shrink-0 inline-flex items-center">
                 DRIVE-THRU ACTIVE (&lt; 3 KM)
               </span>
             </div>
@@ -112,7 +112,7 @@ export const MenuSection: React.FC = () => {
           <button
             key={cat.id}
             onClick={() => setSelectedCategory(cat.id)}
-            className={`px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap transition-all border ${
+            className={`px-3.5 sm:px-4 py-2 rounded-full text-xs font-semibold whitespace-nowrap flex-shrink-0 transition-all border ${
               selectedCategory === cat.id
                 ? 'bg-brand-sky text-black border-brand-sky font-bold shadow-md'
                 : 'bg-white dark:bg-noir-card text-concrete-700 dark:text-zinc-400 border-concrete-300 dark:border-white/10 hover:border-brand-sky'
@@ -142,13 +142,13 @@ export const MenuSection: React.FC = () => {
               
               {/* Badges */}
               {item.badge && (
-                <span className="absolute top-2.5 left-2.5 bg-brand-sky text-black text-[10px] font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md shadow-md">
+                <span className="absolute top-2.5 left-2.5 bg-brand-sky text-black text-[10px] font-black px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-md shadow-md whitespace-nowrap flex-shrink-0 inline-flex items-center">
                   {item.badge}
                 </span>
               )}
 
               {item.isVeg && (
-                <span className="absolute top-2.5 right-2.5 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-500/30 text-emerald-400 bg-black/70 backdrop-blur-md">
+                <span className="absolute top-2.5 right-2.5 text-[10px] font-bold px-2 py-0.5 rounded border border-emerald-500/30 text-emerald-400 bg-black/70 backdrop-blur-md whitespace-nowrap flex-shrink-0 inline-flex items-center">
                   🌱 100% VEG
                 </span>
               )}
@@ -176,7 +176,7 @@ export const MenuSection: React.FC = () => {
 
                 <button
                   onClick={() => addToCart(item)}
-                  className="px-3.5 sm:px-4 py-2 text-xs font-bold rounded-xl bg-brand-sky hover:bg-brand-skyDark text-black shadow-md hover:shadow-brand-sky/20 transition-all flex items-center gap-1.5 active:scale-95"
+                  className="px-3.5 sm:px-4 py-2 text-xs font-bold rounded-xl bg-brand-sky hover:bg-brand-skyDark text-black shadow-md hover:shadow-brand-sky/20 transition-all flex items-center gap-1.5 active:scale-95 whitespace-nowrap flex-shrink-0"
                   aria-label={`Add ${item.name} to car`}
                 >
                   <span>+ Add to Car</span>

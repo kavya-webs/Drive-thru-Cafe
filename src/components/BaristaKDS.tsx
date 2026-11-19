@@ -100,12 +100,12 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
             </div>
             <div className="h-6 w-px bg-concrete-300 dark:border-white/10 hidden sm:block"></div>
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-black tracking-wider uppercase text-concrete-900 dark:text-white">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="text-xs font-black tracking-wider uppercase text-concrete-900 dark:text-white whitespace-nowrap">
                   KDS Terminal · Station 01
                 </span>
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 border border-emerald-500/30 whitespace-nowrap flex-shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse flex-shrink-0"></span>
                   LANE 1 LIVE
                 </span>
               </div>
@@ -207,10 +207,10 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
       {/* BARISTA SUB-HEADER: TAB SWITCHER (LIVE ORDERS vs EDIT MENU) */}
       <div className="bg-white/90 dark:bg-noir-surface/90 backdrop-blur-md border-b border-concrete-300 dark:border-white/10 px-3 sm:px-6 py-2">
         <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-concrete-100 dark:bg-white/5 border border-concrete-200 dark:border-white/10">
+          <div className="flex items-center gap-1.5 p-1 rounded-2xl bg-concrete-100 dark:bg-white/5 border border-concrete-200 dark:border-white/10 overflow-x-auto no-scrollbar">
             <button
               onClick={() => setBaristaTab('orders')}
-              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 sm:gap-2 ${
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 sm:gap-2 whitespace-nowrap flex-shrink-0 ${
                 baristaTab === 'orders'
                   ? 'bg-brand-sky text-black shadow-sm font-black'
                   : 'text-concrete-700 dark:text-zinc-400 hover:text-black dark:hover:text-white'
@@ -218,15 +218,15 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
               id="barista-tab-orders"
             >
               <span>🚗</span>
-              <span>Live KDS Orders</span>
-              <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-black/10 dark:bg-white/10 font-mono font-bold">
+              <span className="whitespace-nowrap">Live KDS Orders</span>
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-black/10 dark:bg-white/10 font-mono font-bold whitespace-nowrap flex-shrink-0">
                 {orders.length}
               </span>
             </button>
 
             <button
               onClick={() => setBaristaTab('menu')}
-              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 sm:gap-2 ${
+              className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 sm:gap-2 whitespace-nowrap flex-shrink-0 ${
                 baristaTab === 'menu'
                   ? 'bg-brand-sky text-black shadow-sm font-black'
                   : 'text-concrete-700 dark:text-zinc-400 hover:text-black dark:hover:text-white'
@@ -234,8 +234,8 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
               id="barista-tab-menu"
             >
               <span>📋</span>
-              <span>Edit Menu</span>
-              <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-black/10 dark:bg-white/10 font-mono font-bold">
+              <span className="whitespace-nowrap">Edit Menu</span>
+              <span className="px-1.5 py-0.5 rounded-full text-[10px] bg-black/10 dark:bg-white/10 font-mono font-bold whitespace-nowrap flex-shrink-0">
                 {menuItems.length}
               </span>
             </button>
@@ -311,7 +311,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
                   Incoming Orders ({incomingOrders.length})
                 </h2>
               </div>
-              <span className="text-[10px] font-mono font-bold text-brand-sky bg-brand-sky/10 px-2 py-0.5 rounded border border-brand-sky/20">
+              <span className="text-[10px] font-mono font-bold text-brand-sky bg-brand-sky/10 px-2 py-0.5 rounded border border-brand-sky/20 whitespace-nowrap flex-shrink-0 inline-flex items-center">
                 ACTION REQUIRED
               </span>
             </div>
@@ -439,7 +439,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
                   Brewing & Kitchen ({brewingOrders.length})
                 </h2>
               </div>
-              <span className="text-[10px] font-mono font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20">
+              <span className="text-[10px] font-mono font-bold text-amber-500 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 whitespace-nowrap flex-shrink-0 inline-flex items-center">
                 IN PROGRESS
               </span>
             </div>
@@ -552,7 +552,7 @@ export const BaristaKDS: React.FC<BaristaKDSProps> = ({ onLogout }) => {
                   Ready at Window ({readyOrders.length})
                 </h2>
               </div>
-              <span className="text-[10px] font-mono font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+              <span className="text-[10px] font-mono font-bold text-emerald-500 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20 whitespace-nowrap flex-shrink-0 inline-flex items-center">
                 DRIVE-THRU LANE 1
               </span>
             </div>

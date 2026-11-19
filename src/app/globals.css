@@ -57,3 +57,31 @@
 @keyframes stroke {
   100% { stroke-dashoffset: 0; }
 }
+
+/* ==========================================================================
+   Universal Anti-Squish & Responsiveness Hardening
+   Prevents any button, tab, badge, pill, or tag from squishing, collapsing,
+   or wrapping words into awkward vertical word stacks on mobile/tablet screens.
+   ========================================================================== */
+
+/* Buttons, Tabs, & Clickable Controls: keep labels unbroken on single lines */
+button:not(.allow-wrap),
+[role="button"]:not(.allow-wrap),
+[role="tab"]:not(.allow-wrap) {
+  white-space: nowrap;
+}
+
+/* Status pills, indicator tags, and compact rounded badges */
+span[class*="rounded-full"],
+span[class*="rounded-md"],
+span[class*="rounded-lg"],
+span[class*="rounded-xl"],
+span[class*="rounded"],
+.badge,
+.pill,
+.chip {
+  white-space: nowrap !important;
+  flex-shrink: 0 !important;
+  word-break: keep-all !important;
+  overflow-wrap: normal !important;
+}

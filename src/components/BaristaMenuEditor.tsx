@@ -160,36 +160,37 @@ export const BaristaMenuEditor: React.FC = () => {
       
       {/* Top Banner & Quick Controls */}
       <div className="p-4 sm:p-6 rounded-3xl bg-white dark:bg-noir-card border border-concrete-300 dark:border-white/10 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2">
-            <h1 className="text-lg sm:text-xl font-black text-concrete-900 dark:text-white">
+        <div className="min-w-0 w-full md:w-auto">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-2.5">
+            <h1 className="text-base sm:text-xl font-black text-concrete-900 dark:text-white leading-tight">
               Menu Manager &amp; Live Price Editor
             </h1>
-            <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-brand-sky/20 text-brand-sky border border-brand-sky/30">
+            <span className="inline-flex items-center gap-1.5 text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-brand-sky/15 text-brand-sky border border-brand-sky/30 whitespace-nowrap flex-shrink-0 shadow-sm">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand-sky animate-pulse flex-shrink-0"></span>
               REAL-TIME SYNC
             </span>
           </div>
-          <p className="text-xs text-concrete-600 dark:text-zinc-400 mt-1">
+          <p className="text-xs text-concrete-600 dark:text-zinc-400 mt-1.5 leading-relaxed">
             Add items, edit titles, adjust live prices, or replace food photos. All updates sync instantly to customer phones.
           </p>
         </div>
 
-        <div className="flex items-center gap-2.5 w-full md:w-auto">
+        <div className="flex items-center gap-2 sm:gap-2.5 w-full md:w-auto flex-shrink-0">
           <button
             onClick={resetMenuToDefault}
-            className="px-3.5 py-2 rounded-xl border border-concrete-300 dark:border-white/10 hover:border-concrete-400 text-concrete-700 dark:text-zinc-300 text-xs font-bold transition flex items-center gap-1.5"
+            className="px-3 sm:px-3.5 py-2 rounded-xl border border-concrete-300 dark:border-white/10 hover:border-concrete-400 text-concrete-700 dark:text-zinc-300 text-xs font-bold transition flex items-center justify-center gap-1.5 whitespace-nowrap flex-shrink-0"
             title="Reset menu to default signature items"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Reset Defaults</span>
+            <RotateCcw className="w-3.5 h-3.5 flex-shrink-0" />
+            <span>Reset Defaults</span>
           </button>
 
           <button
             onClick={handleOpenCreate}
-            className="flex-1 md:flex-initial px-4 py-2.5 rounded-xl bg-brand-sky hover:bg-brand-skyDark text-black text-xs font-bold shadow-md transition flex items-center justify-center gap-1.5 active:scale-95"
+            className="flex-1 md:flex-initial px-4 py-2.5 rounded-xl bg-brand-sky hover:bg-brand-skyDark text-black text-xs font-bold shadow-md transition flex items-center justify-center gap-1.5 active:scale-95 whitespace-nowrap flex-shrink-0"
             id="add-menu-item-button"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 flex-shrink-0" />
             <span>+ Add New Item</span>
           </button>
         </div>
@@ -203,7 +204,7 @@ export const BaristaMenuEditor: React.FC = () => {
             <button
               key={cat.id}
               onClick={() => setSelectedCategory(cat.id)}
-              className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap transition border ${
+              className={`px-3 py-1.5 rounded-xl font-bold whitespace-nowrap flex-shrink-0 transition border ${
                 selectedCategory === cat.id
                   ? 'bg-brand-sky text-black border-brand-sky shadow-sm'
                   : 'bg-white dark:bg-noir-card text-concrete-700 dark:text-zinc-400 border-concrete-300 dark:border-white/10 hover:border-brand-sky'
@@ -246,13 +247,13 @@ export const BaristaMenuEditor: React.FC = () => {
               
               {/* Badges */}
               {item.badge && (
-                <span className="absolute top-2.5 left-2.5 bg-brand-sky text-black text-[10px] font-black px-2 py-0.5 rounded shadow">
+                <span className="absolute top-2.5 left-2.5 bg-brand-sky text-black text-[10px] font-black px-2 py-0.5 rounded shadow whitespace-nowrap flex-shrink-0 inline-flex items-center">
                   {item.badge}
                 </span>
               )}
 
               {item.isVeg && (
-                <span className="absolute top-2.5 right-2.5 text-[10px] font-bold px-1.5 py-0.5 rounded border border-emerald-500/30 text-emerald-400 bg-black/70 backdrop-blur-md">
+                <span className="absolute top-2.5 right-2.5 text-[10px] font-bold px-1.5 py-0.5 rounded border border-emerald-500/30 text-emerald-400 bg-black/70 backdrop-blur-md whitespace-nowrap flex-shrink-0 inline-flex items-center">
                   🌱 100% VEG
                 </span>
               )}
@@ -494,7 +495,7 @@ export const BaristaMenuEditor: React.FC = () => {
                         key={idx}
                         type="button"
                         onClick={() => setFormImage(preset.url)}
-                        className={`px-2 py-0.5 rounded text-[10px] font-semibold transition border ${
+                        className={`px-2 py-0.5 rounded text-[10px] font-semibold transition border whitespace-nowrap flex-shrink-0 ${
                           formImage === preset.url
                             ? 'bg-brand-sky text-black border-brand-sky font-bold'
                             : 'bg-white dark:bg-noir-surface text-concrete-600 dark:text-zinc-400 border-concrete-200 dark:border-white/5'

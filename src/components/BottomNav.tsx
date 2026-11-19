@@ -26,7 +26,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentView, onNavigate })
             onNavigate('menu');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className={`flex-1 py-2.5 px-3 rounded-2xl transition-all flex items-center justify-center gap-2 text-xs font-bold ${
+          className={`flex-1 py-2.5 px-3 rounded-2xl transition-all flex items-center justify-center gap-2 text-xs font-bold whitespace-nowrap flex-shrink-0 ${
             currentView === 'menu'
               ? 'bg-brand-sky text-black shadow-md shadow-brand-sky/25 font-black scale-[1.02]'
               : 'text-concrete-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-concrete-100 dark:hover:bg-white/5'
@@ -34,7 +34,7 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentView, onNavigate })
           aria-label="View Drive-Thru Menu"
         >
           <Coffee className="w-4 h-4 flex-shrink-0" />
-          <span>Drive-Thru Menu</span>
+          <span className="whitespace-nowrap">Drive-Thru Menu</span>
         </button>
 
         {/* Tab 2: Live Token */}
@@ -43,20 +43,20 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentView, onNavigate })
             onNavigate('track');
             window.scrollTo({ top: 0, behavior: 'smooth' });
           }}
-          className={`flex-1 py-2.5 px-3 rounded-2xl transition-all flex items-center justify-center gap-2 text-xs font-bold relative ${
+          className={`flex-1 py-2.5 px-3 rounded-2xl transition-all flex items-center justify-center gap-2 text-xs font-bold relative whitespace-nowrap flex-shrink-0 ${
             currentView === 'track'
               ? 'bg-brand-sky text-black shadow-md shadow-brand-sky/25 font-black scale-[1.02]'
               : 'text-concrete-600 dark:text-zinc-400 hover:text-black dark:hover:text-white hover:bg-concrete-100 dark:hover:bg-white/5'
           }`}
           aria-label="View Live Drive-Thru Token"
         >
-          <div className="relative">
+          <div className="relative flex-shrink-0">
             <MapPin className="w-4 h-4 flex-shrink-0" />
             {activeOrder && (
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping absolute -top-0.5 -right-0.5"></span>
             )}
           </div>
-          <span>
+          <span className="whitespace-nowrap">
             {activeOrder ? `Live Token (${activeOrder.token})` : 'Live Token'}
           </span>
           {activeOrder && (

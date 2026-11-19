@@ -84,8 +84,8 @@ export const LiveTokenView: React.FC<{ onNavigateToMenu: () => void }> = ({ onNa
           </span>
         </div>
 
-        <span className="text-[11px] font-black tracking-widest px-3.5 py-1 rounded-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 uppercase inline-block mb-2">
-          ORDER HANDED OFF & PAID
+        <span className="text-[11px] font-black tracking-widest px-3.5 py-1 rounded-full bg-emerald-500/15 text-emerald-500 border border-emerald-500/30 uppercase inline-flex items-center justify-center whitespace-nowrap flex-shrink-0 mb-2">
+          ORDER HANDED OFF &amp; PAID
         </span>
 
         <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-concrete-900 dark:text-white">
@@ -321,9 +321,9 @@ export const LiveTokenView: React.FC<{ onNavigateToMenu: () => void }> = ({ onNa
           <h3 className="text-sm font-bold text-concrete-900 dark:text-white">
             Order Items Summary
           </h3>
-          <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 flex items-center gap-1 self-start sm:self-auto">
-            <ShieldCheck className="w-3.5 h-3.5" />
-            <span>PAY PHYSICALLY AT WINDOW</span>
+          <span className="text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2.5 py-0.5 rounded-full border border-emerald-500/20 inline-flex items-center gap-1 self-start sm:self-auto whitespace-nowrap flex-shrink-0">
+            <ShieldCheck className="w-3.5 h-3.5 flex-shrink-0" />
+            <span className="whitespace-nowrap">PAY PHYSICALLY AT WINDOW</span>
           </span>
         </div>
 
